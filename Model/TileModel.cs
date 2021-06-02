@@ -1,4 +1,6 @@
-﻿namespace frontend.Model
+﻿using System.Text.Json.Serialization;
+
+namespace frontend.Model
 {
     public class TileModel
     {
@@ -14,13 +16,14 @@
 
         public string HoverColor { get; set; }
 
+        [JsonIgnore]
         public GameModel GameModel { get; set; }
 
         public void OnTileClick()
         {
             if (GameModel.PlayerCharacter.IsInMovingMode)
             {
-                GameModel.PlayerCharacter.MoveTo(X, Y);
+                GameModel.PlayerCharacter.MoveTo(this);
                 GameModel.ToggleMoving();
             }
         }

@@ -25,12 +25,13 @@
 </div>
 
 <div>
-    <button @onclick="Up">UP</button>
-    <button @onclick="Down">DOWN</button>
-    <button @onclick="Left">LEFT</button>
-    <button @onclick="Right">RIGHT</button>
-    <button @onclick="ToggleMoving">TOGGLE MOVING</button>
-    <button @onclick="ToggleAttacking">TOGGLE ATTACKING</button>
+    <button class="btn btn-light" @onclick="Up">UP</button>
+    <button class="btn btn-light" @onclick="Down">DOWN</button>
+    <button class="btn btn-light" @onclick="Left">LEFT</button>
+    <button class="btn btn-light" @onclick="Right">RIGHT</button>
+    <button class="btn btn-light" @onclick="ToggleMoving">TOGGLE MOVING</button>
+    @* <button @onclick="ToggleAttacking">TOGGLE ATTACKING</button> *@
+    <button class="btn btn-light" @onclick="EndTurn">END TURN</button>
 </div>
 
 @code {
@@ -115,6 +116,12 @@
     private void ToggleAttacking()
     {
         Game.ToggleAttacking();
+    }
+
+    private void EndTurn()
+    {
+        Game.PlayerCharacter.MouvementPoint = 3;
+        Game.PlayerCharacter.IsInMovingMode = false;
     }
 
 }

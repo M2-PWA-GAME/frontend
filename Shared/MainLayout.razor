@@ -1,3 +1,6 @@
+@using frontend.Service.Declaration
+@using frontend.Model.User
+@using frontend.Service.Implementation
 @inherits LayoutComponentBase
 
 <div class="page">
@@ -7,7 +10,15 @@
 
     <div class="main">
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            @if (User != null)
+            {
+@*                 <a href='/user/me'>Me</a> *@
+                @User.UserName
+            }
+            else
+            {
+                <a href='/user/signin'>SignIn</a>
+            }
         </div>
 
         <div class="content px-4">
@@ -15,3 +26,31 @@
         </div>
     </div>
 </div>
+
+@code
+{
+    [Inject]
+    public IUserService UserService { get; set; }
+
+    public UserConnectionModel User = null;
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        User = await UserService.GetCurrentUser();
+        ((UserService)UserService).UserChanged += UserChangedHandler;
+    }
+
+    private async void UserChangedHandler()
+    {
+        User = await UserService.GetCurrentUser();
+    }
+}
