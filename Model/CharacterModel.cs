@@ -1,5 +1,7 @@
 ﻿using System;
 
+using frontend.Component;
+
 namespace frontend.Model
 {
     public class CharacterModel
@@ -27,14 +29,14 @@ namespace frontend.Model
 
         public bool IsInAttackingMode { get; set; }
 
-        public void MoveTo(int x, int y)
+        public void MoveTo(TileModel tile)
         {
 
-            int tileDistance = Math.Abs(X - x) + Math.Abs(Y - y);
-            if (tileDistance <= MouvementPoint)
+            int tileDistance = Math.Abs(X - tile.X) + Math.Abs(Y - tile.Y);
+            if (tileDistance <= MouvementPoint && tile.IsNavigable)
             {
-                X = x;
-                Y = y;
+                X = tile.X;
+                Y = tile.Y;
                 MouvementPoint = MouvementPoint - tileDistance;
             }
         }

@@ -1,12 +1,15 @@
 using System;
+using System.Linq;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text;
+
+using Blazored.LocalStorage;
+
+using frontend.Service.Declaration;
+using frontend.Service.Implementation;
+
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace frontend
 {
@@ -17,7 +20,12 @@ namespace frontend
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddBlazoredLocalStorage();
+
+            // builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://medieval-warfare.herokuapp.com/") });
+            // builder.Services.AddSingleton<IUserService, UserService>(provider => new UserService((ILocalStorageService)provider.GetService(typeof(ILocalStorageService))));
+            builder.Services.AddSingleton<IUserService, UserService>();
 
             await builder.Build().RunAsync();
         }

@@ -42,7 +42,7 @@ namespace frontend.Model
 
         public void DisplayMovingRange()
         {
-            foreach (var tileModel in Tiles)
+            foreach (var tileModel in Tiles.Where(t => t.IsNavigable))
             {
                 int tileDistance = Math.Abs(tileModel.X - PlayerCharacter.X) + Math.Abs(tileModel.Y - PlayerCharacter.Y);
                 if (tileDistance <= PlayerCharacter.MouvementPoint)
