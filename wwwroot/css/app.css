@@ -1,4 +1,4 @@
-@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -42,9 +42,72 @@ a, .btn-link {
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+
+.map {
+    position: relative;
+}
+
+.tile {
+    width: 32px;
+    height: 32px;
+    position: relative;
+}
+
+.tile > .object {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    z-index: 40;
+}
+
+.tile > .object > img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.tile > .floor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    z-index: 20;
+}
+
+    .tile > .hover {
         position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 30;
     }
+
+.tile > .floor > img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.player {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 40;
+    transition: top ease-in-out 1s, left ease-in-out 1s;
+}
+
+        .player > img {
+            max-width: 100%;
+            max-height: 100%;
+        }

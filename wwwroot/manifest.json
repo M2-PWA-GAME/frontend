@@ -1,6 +1,6 @@
 {
-  "name": "frontend",
-  "short_name": "frontend",
+  "name": "Medieval Warfare",
+  "short_name": "MW",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",

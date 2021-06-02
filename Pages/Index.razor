@@ -1,7 +1,43 @@
 ﻿@page "/"
+@using frontend.Model
 
-<h1>Hello, world!</h1>
+<Maps Game="Game"/>
 
-Welcome to your new app.
+@code
+{
+    GameModel Game = new GameModel
+    {
+        Tiles = new List<TileModel>(),
+        XMax = 25,
+        YMax = 25,
+        PlayerCharacter = new CharacterModel
+        {
+            BaseCharacterImage = "/img/Characters/MainCharacter/Character_32_",
+            X = 0,
+            Y = 0,
+            Orientation = Orientation.DOWN,
+            MouvementPoint = 3,
+            IsInAttackingMode = false,
+            IsInMovingMode = false
+        }
+    };
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        for (int x = 0; x < Game.XMax; x++)
+        {
+            for (int y = 0; y < Game.YMax; y++)
+            {
+                Game.Tiles.Add(new TileModel { X = x, Y = y, MapImage = "/img/grass_32.png", GameModel = Game});
+            }
+        }
+    }
+
+
+}
