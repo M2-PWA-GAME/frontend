@@ -17,13 +17,13 @@
         @if (!IsSignIn)
         {
             <div>
-                Password:
-                <InputText @bind-Value="UserConnectionModel.Email"/>
+                Email:
+                <InputText type="email" @bind-Value="UserConnectionModel.Email"/>
             </div>
         }
         <div>
             Password:
-            <InputText @bind-Value="UserConnectionModel.Password"/>
+            <InputText type="password" @bind-Value="UserConnectionModel.Password"/>
         </div>
     </p>
 

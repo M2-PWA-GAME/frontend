@@ -170,6 +170,7 @@ namespace frontend.Service.Implementation
             if (UserConnection == null)
             {
                 await UpdateUser();
+                UserConnection.Password = null;
                 await LocalStorageInterop.SetItem(_jsRuntime, "user", JsonSerializer.Serialize(UserConnection));
             }
         }

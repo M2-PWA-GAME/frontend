@@ -3,10 +3,13 @@
     <div class="hover" style="background-color: @ActualTile.HoverColor; opacity: 0.5">
     </div>
     <div class="object">
-        <img src="@ActualTile.ObjectImage" />
+        @if (!string.IsNullOrWhiteSpace(ActualTile.ObjectImage))
+        {
+            <img alt="Object image" src="@ActualTile.ObjectImage"/>
+        }
     </div>
     <div class="floor">
-        <img src="@ActualTile.MapImage" />
+        <img alt="Map image" src="@ActualTile.MapImage" />
     </div>
 </div>
 
