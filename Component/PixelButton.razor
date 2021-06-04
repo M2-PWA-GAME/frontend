@@ -1,0 +1,84 @@
+@using frontend.Model
+
+<div style-id="@ScopedStyleId" class="pixelButton" @onclick="OnClickCallback"> @title </div>
+
+
+<style>
+.pixelButton[style-id="@ScopedStyleId"] {
+  display: block;
+  width: @width;
+  background-color: @color;
+  text-align: center;
+  font-size: 25px;
+  color: white;
+  height: auto;
+  margin: 10px;
+  font-family: 'VT323';
+  position: relative;
+  vertical-align: top;
+  text-transform: uppercase;
+  
+  cursor: pointer;
+}
+
+.pixelButton[style-id="@ScopedStyleId"]:active {
+  top: 2px;
+}
+
+.pixelButton[style-id="@ScopedStyleId"]::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: -10px;
+  right: -10px;
+  background: @color;
+  z-index: -1;
+}
+
+.pixelButton[style-id="@ScopedStyleId"]::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: -6px;
+  right: -6px;
+  background: @color;
+  z-index: -1;
+}
+</style>
+
+
+@code {
+    [Parameter]
+    public String title { get; set; }
+
+    [Parameter]
+    public String color { get; set; }
+        
+    [Parameter]
+    public String width { get; set; } = "400px";
+
+    [Parameter]
+    public EventCallback OnClickCallback { get; set; }
+
+    public int ScopedStyleId;
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        ScopedStyleId = GeneratRandomInt();
+    }
+    private int GeneratRandomInt()
+    {
+      Random aleatoire = new Random();
+      int entier = aleatoire.Next();
+      return entier;
+    }
+
+}
