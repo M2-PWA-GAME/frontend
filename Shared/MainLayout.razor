@@ -4,12 +4,8 @@
 @inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <div class="main">
-        <div class="top-row px-4">
+    <NavMenu />
+    <main>
             @if (User != null)
             {
 @*                 <a href='/user/me'>Me</a> *@
@@ -19,13 +15,20 @@
             {
                 <a href='/user/signin'>SignIn</a>
             }
-        </div>
-
-        <div class="content px-4">
             @Body
-        </div>
-    </div>
+    </main>
 </div>
+<style>
+main {
+    width: 100%;
+    margin: 120px clamp(50px, 10%, 150px) 0;
+}
+@@media only screen and (max-width: 768px){
+    main {
+        margin: 100px 10px 0;
+    }
+}
+</style>
 
 @code
 {
