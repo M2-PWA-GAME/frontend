@@ -1,14 +1,11 @@
 ﻿@page "/"
 @using frontend.Model
-@using System.Security.Cryptography.X509Certificates
-@using Blazored.LocalStorage
+@using frontend.Model.Game
 
 <Maps Game="Game" />
 
 @code
 {
-    [Inject]
-    public ILocalStorageService LocalStorageService { get; set; }
     GameModel Game = new GameModel
     {
         Tiles = new List<TileModel>(),
@@ -50,7 +47,7 @@
                 {
                     rnd = 0;
                 }
-                Game.Tiles.Add(new TileModel { X = x, Y = y, MapImage = "/img/grass_32.png", GameModel = Game, IsNavigable = !(rnd >= 90), ObjectImage = rnd >= 90 ? "/img/rock_32.png" : "" });
+                Game.Tiles.Add(new TileModel { Position = new Vector2Model{ X = x, Y = y }, MapImage = "/img/grass_32.png", GameModel = Game, IsNavigable = !(rnd >= 90), ObjectImage = rnd >= 90 ? "/img/rock_32.png" : "" });
             }
         }
     }

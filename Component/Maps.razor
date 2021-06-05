@@ -16,7 +16,6 @@
             }
 
         </div>
-
         
         <div class="player" style="top: @(Game.PlayerCharacter.Y * 32)px; left: @(Game.PlayerCharacter.X * 32)px;" @onmouseover="MouseOverPlayer" @onmouseout="MouseOutPlayer">
             <img alt="Player image" src="@Game.PlayerCharacter.CharacterImage" />
@@ -55,7 +54,7 @@
 
     public TileModel GetTileAt(int x, int y)
     {
-        return Game.Tiles.FirstOrDefault(t => t.X == x && t.Y == y);
+        return Game.Tiles.FirstOrDefault(t => t.Position.X == x && t.Position.Y == y);
     }
 
     public void Up()

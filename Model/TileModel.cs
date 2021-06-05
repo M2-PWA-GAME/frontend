@@ -1,12 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 
+using frontend.Model.Game;
+
 namespace frontend.Model
 {
     public class TileModel
     {
-        public int X { get; set; }
-
-        public int Y { get; set; }
+        [JsonPropertyName("position")]
+        public Vector2Model Position { get; set; }
 
         public string MapImage { get; set; }
 
@@ -15,6 +16,9 @@ namespace frontend.Model
         public bool IsNavigable { get; set; }
 
         public string HoverColor { get; set; }
+
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
 
         [JsonIgnore]
         public GameModel GameModel { get; set; }

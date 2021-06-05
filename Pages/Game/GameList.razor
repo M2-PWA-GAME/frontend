@@ -1,0 +1,32 @@
+﻿@page "/games"
+@using frontend.Service.Declaration
+@using frontend.Model
+@using frontend.Model.Game
+
+
+<MapPreview Seed="1000" XMax="50" YMax="50"></MapPreview>
+
+
+@code {
+
+    /// <summary>
+    /// Obtient ou définit 
+    /// </summary>
+    [Inject]
+    public IGameService GameService { get; set; }
+
+    public List<GameListModel> Games { get; set; }
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+}

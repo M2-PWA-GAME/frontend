@@ -7,8 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-using Blazored.LocalStorage;
-
 using frontend.Model.User;
 using frontend.Service.Declaration;
 using frontend.Utils.Interop;
@@ -43,9 +41,21 @@ namespace frontend.Service.Implementation
 
         public event Action UserChanged;
 
+        private static UserService _instance = null;
+
+        public static UserService GetInstance()
+        {
+            return _instance;
+        }
+
         public UserService(IJSRuntime jsRuntime)
         {
+            if (_instance != null)
+            {
+                throw new Exception($"Une instance {nameof(UserService)} déjà existante");
+            }
             _jsRuntime = jsRuntime;
+            _instance = this;
         }
         
         /// <summary>
@@ -57,7 +67,7 @@ namespace frontend.Service.Implementation
         {
             try
             {
-                using (HttpClient http = new HttpClient ())
+                using (HttpClient http = new HttpClient())
                 {
                     string json = JsonSerializer.Serialize(userConnection);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -97,6 +107,20 @@ namespace frontend.Service.Implementation
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Récupère l'utilisateur connecté.
+        /// </summary>
+        /// <returns>Utilisateur connecté.</returns>
+        public async Task<string> GetCurrentToken()
+        {
+            if (CurrentToken == null)
+            {
+                CurrentToken = await LocalStorageInterop.GetItem(_jsRuntime, "jwt");
+            }
+
+            return CurrentToken;
         }
 
         /// <summary>

@@ -1,0 +1,101 @@
+﻿@using frontend.Model
+@using frontend.Model.Game
+@using frontend.Service.Declaration
+@using frontend.Service.Implementation
+
+@if (Game != null)
+{
+    <div class="map-16" style="display: flex; align-items: center; justify-content: center;">
+        <div class="map">
+            <div style="display: grid; grid-template-columns: repeat(@Game.XMax, 1fr); width: @(16 * Game.XMax)">
+
+                @for (int x = 0; x < Game.XMax; x++)
+                {
+                    @for (int y = 0; y < Game.YMax; y++)
+                    {
+                        <div style="grid-row: @(y + 1);">
+                            <Tile X="x" Y="y" ActualTile="GetTileAt(x, y)" Game="Game" />
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<div>
+    <input type="text" @bind-value="NewXMax" />
+</div>
+<div>
+    <input type="text" @bind-value="NewYMax" />
+</div>
+<div>
+    <button @onclick="Callback"> Reload</button>
+</div>
+
+
+
+@code {
+    public GameModel Game { get; set; }
+
+    [Parameter]
+    public int YMax { get; set; }
+
+    public int NewYMax { get; set; }
+
+    [Parameter]
+    public int XMax { get; set; }
+
+    public int NewXMax { get; set; }
+
+    [Parameter]
+    public int? Seed { get; set; }
+
+    [Inject]
+    public IGameService GameService { get; set; }
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        NewXMax = XMax;
+        NewYMax = YMax;
+        await ReloadMapAsync();
+    }
+
+    private async Task ReloadMapAsync()
+    {
+        XMax = NewXMax;
+        YMax = NewYMax;
+
+        Game = await GameService.GenerateRandomMap(new GameGeneratorModel
+        {
+            XMax = XMax,
+            YMax = YMax
+        });
+
+        GameService.InitGame(Game);
+
+        StateHasChanged();
+    }
+
+    public TileModel GetTileAt(int x, int y)
+    {
+        return Game.Tiles.FirstOrDefault(t => t.Position.X == x && t.Position.Y == y);
+    }
+
+    private async void Callback(MouseEventArgs obj)
+    {
+        await ReloadMapAsync();
+    }
+
+}

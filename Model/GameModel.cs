@@ -1,16 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace frontend.Model
 {
     public class GameModel
     {
 
+        [JsonPropertyName("xmax")]
         public int XMax { get; set; }
 
+        [JsonPropertyName("ymax")]
         public int YMax { get; set; }
 
+        [JsonPropertyName("seed")]
+        public int Seed { get; set; }
+
+        [JsonPropertyName("tiles")]
         public List<TileModel> Tiles { get; set; }
 
         public CharacterModel PlayerCharacter { get; set; }
@@ -44,7 +51,7 @@ namespace frontend.Model
         {
             foreach (var tileModel in Tiles.Where(t => t.IsNavigable))
             {
-                int tileDistance = Math.Abs(tileModel.X - PlayerCharacter.X) + Math.Abs(tileModel.Y - PlayerCharacter.Y);
+                int tileDistance = Math.Abs(tileModel.Position.X - PlayerCharacter.X) + Math.Abs(tileModel.Position.Y - PlayerCharacter.Y);
                 if (tileDistance <= PlayerCharacter.MouvementPoint)
                 {
                     tileModel.HoverColor = "#2980b9";

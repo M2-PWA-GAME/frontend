@@ -60,6 +60,11 @@ a, .btn-link {
     position: relative;
 }
 
+.map-16 .tile {
+    width: 16px !important;
+    height: 16px !important;
+}
+
 .tile > .object {
     position: absolute;
     top: 0;
