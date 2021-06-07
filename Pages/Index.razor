@@ -3,12 +3,40 @@
 @using System.Security.Cryptography.X509Certificates
 @using Blazored.LocalStorage
 
-<PixelButton title="Bouton 2" color="#37d6c8" width="60px"/>
-<PixelButton title="Autre button" color="red" />
+<PixelButton title="Bouton 2" color="#37d6c8" width="60px" OnClickCallback="@OpenOtherPopUp"/>
+<PixelButton title="Autre button" color="red" OnClickCallback="@OpenPopUp"/>
+<PopUp @bind-DisplayPopUp="@DisplayTestPopUp">
+    <Content>
+        <p>Test</p>
+    </Content>
+    <Action>
+        <button>Test</button>
+    </Action>
+</PopUp>
+
+<PopUp @bind-DisplayPopUp="@DisplayOtherPopUp">
+    <Content>
+        <p>Une autre popUp</p>
+    </Content>
+    <Action>
+        <button>Autre</button>
+    </Action>
+</PopUp>
 <p>
     @message
 </p>
 
 @code{
     public String message;
+
+    public Boolean DisplayTestPopUp = false;
+    public Boolean DisplayOtherPopUp = false;
+
+    private void OpenPopUp() {
+        DisplayTestPopUp = true;
+    }
+
+    private void OpenOtherPopUp() {
+        DisplayOtherPopUp = true;
+    }
 }
