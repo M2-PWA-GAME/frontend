@@ -1,2 +1,74 @@
 @page "/register"
 @layout NotConnectedLayout
+
+<section  class="register">
+    <h1>Inscription</h1>
+    <form>
+    
+    <CustomInput label="Pseudo"/>
+    <CustomInput label="Email"/>
+    <CustomInput type="password" label="Mot de passe"/>
+    <CustomInput type="password" label="Confirmation mot de passe"/>
+    
+  </form>
+    <div class="bottomInfo">
+        <NavLink class="registerButton" href="/register" Match="NavLinkMatch.All">
+            <p>S'inscrire</p>
+        </NavLink>
+        <p>Vous avez deja un compte ?</p>
+        <NavLink href="/login" Match="NavLinkMatch.All">
+            <i>Se connecter</i>
+        </NavLink>
+    </div>
+</section>
+
+<style>
+.register {
+    text-align: center;
+}   
+.register h1 {
+    display: inline-block;
+    width: calc(100% - 60px);
+    text-align: center;
+    font-size: 1.8em;
+    padding: 20px 30px;
+    margin: clamp(100px, 12vh, 12vh) 0;
+}
+.register .bottomInfo {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    margin: clamp(20px, 5vh, 200px) 0;
+    text-align: center;
+}
+.register .registerButton{
+    display: block;
+    width: calc(100% - 200px);
+    padding: 15px 20px;
+    margin: 30px 80px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 1.2em;
+    color: white;
+    background-color: black;
+    border: 1px solid black;
+}
+
+.register .bottomInfo i{
+    display: inline-block;
+}
+.register .bottomInfo i{
+    color: black;
+    text-decoration: underline;
+}
+
+.register form{
+    display: inline-block;
+    text-align: center;
+    width: calc(100% - 80px);
+    margin: 0px 40px;
+}
+
+</style>
