@@ -2,17 +2,14 @@
 @using frontend.Model
 @using System.Security.Cryptography.X509Certificates
 @using Blazored.LocalStorage
+@inject NavigationManager NavigationManager
 @layout NotConnectedLayout
 
 <section  class="logPortal">
     <h1>Nom de l'application</h1>
     <div class="redirectButtons">
-        <NavLink class="redirectButtons__links--full" href="/login" Match="NavLinkMatch.All">
-            <p>Connexion</p>
-        </NavLink>
-        <NavLink class="redirectButtons__links" href="/register" Match="NavLinkMatch.All">
-            <p>Inscription</p>
-        </NavLink>
+        <CustomButton title="Connexion" full="true" OnClickCallback="@RedirectToLogin"/>
+        <CustomButton title="Inscription" OnClickCallback="@RedirectToRegister"/>
     </div>
 </section>
 
@@ -34,29 +31,17 @@
     height: auto;
     margin: clamp(20px, 5vh, 200px) 0;
 }
-.logPortal .redirectButtons__links {
-    display: block;
-    width: calc(100% - 200px);
-    padding: 15px 20px;
-    margin: 30px 80px;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 1.2em;
-    color: black;
-    background-color: white;
-    border: 1px solid black;
-}
-.logPortal .redirectButtons__links--full{
-    display: block;
-    width: calc(100% - 200px);
-    padding: 15px 20px;
-    margin: 30px 80px;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 1.2em;
-
-    color: white;
-    background-color: black;
-    border: 1px solid black;
-}
 </style>
+
+@code{
+    private void RedirectToRegister(){
+        RedirectTo("register");
+    }
+    private void RedirectToLogin(){
+        RedirectTo("login");
+    }
+    private void RedirectTo(String redirecton)
+    {
+        NavigationManager.NavigateTo(redirecton);
+    }
+}

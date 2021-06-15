@@ -11,9 +11,7 @@
     
   </form>
     <div class="bottomInfo">
-        <NavLink class="loginButton" href="/login" Match="NavLinkMatch.All">
-            <p>Se connecter</p>
-        </NavLink>
+        <CustomButton title="Connexion" full="true"/>
         <p>Pas encore de compte ?</p>
         <NavLink href="/register" Match="NavLinkMatch.All">
             <i>Se cree un compte</i>
@@ -42,23 +40,9 @@
     margin: clamp(20px, 5vh, 200px) 0;
     text-align: center;
 }
-.login .loginButton{
-    display: block;
-    width: calc(100% - 200px);
-    padding: 15px 20px;
-    margin: 30px 80px;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 1.2em;
-    color: white;
-    background-color: black;
-    border: 1px solid black;
-}
 
 .login .bottomInfo i{
     display: inline-block;
-}
-.login .bottomInfo i{
     color: black;
     text-decoration: underline;
 }
@@ -71,3 +55,6 @@
 }
 
 </style>
+
+@code{
+}
