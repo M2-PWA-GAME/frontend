@@ -6,16 +6,7 @@
 <div class="page">
     <NavMenu />
     <main>
-            @if (User != null)
-            {
-@*                 <a href='/user/me'>Me</a> *@
-                @User.UserName
-            }
-            else
-            {
-                <a href='/user/signin'>SignIn</a>
-            }
-            @Body
+        @Body
     </main>
 </div>
 <style>

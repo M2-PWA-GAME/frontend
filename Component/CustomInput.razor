@@ -1,13 +1,31 @@
   @using frontend.Model
   
     
-<div class="inputGroup">      
-    <input type="@type" required>
+<div class="inputGroup">
+    <InputText type="@type" @bind-Value="inputValue"/>      
     <span class="bar"/>
     <label>@label</label>
 </div>
 
 @code {
+
+    private String _inputValue;
+
+    [Parameter]
+    public String inputValue
+    {
+        get => _inputValue;
+        set
+        {
+            if (_inputValue == value ) return;
+            _inputValue = value;
+            InputValueChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<String> InputValueChanged { get; set; }
+
     [Parameter]
     public String label { get; set; }
 

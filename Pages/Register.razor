@@ -1,14 +1,15 @@
 @page "/register"
 @layout NotConnectedLayout
+@using frontend.Model.User
+@using frontend.Service.Declaration
 
 <section  class="register">
     <h1>Inscription</h1>
-    <form>
-        <CustomInput label="Pseudo"/>
-        <CustomInput label="Email"/>
-        <CustomInput type="password" label="Mot de passe"/>
-        <CustomInput type="password" label="Confirmation mot de passe"/>
-    </form>
+    <EditForm EditContext="@editContext" OnSubmit="@HandleSubmit">
+        <CustomInput label="Email" @bind-inputValue="UserConnectionModel.Email"/>
+        <CustomInput type="password" label="Mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
+        <CustomInput type="password" label="Confirmation mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
+    </EditForm>
     <div class="bottomInfo">
         <CustomButton title="Inscription" full="true"/>
         <p>Vous avez deja un compte ?</p>
@@ -54,3 +55,37 @@
 }
 
 </style>
+
+@code {
+    [Inject]
+    public IUserService UserService { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    public UserConnectionModel UserConnectionModel = new UserConnectionModel();
+
+    private EditContext editContext;
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        editContext = new EditContext(UserConnectionModel);
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (editContext.Validate())
+        {
+            await UserService.SignUp(UserConnectionModel);
+            NavigationManager.NavigateTo("/home");
+        }
+    }
+}
