@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using frontend.Model.User;
 using frontend.Service.Declaration;
+using frontend.Utils.Helper;
 using frontend.Utils.Interop;
 
 using Microsoft.AspNetCore.Components;
@@ -33,6 +34,11 @@ namespace frontend.Service.Implementation
         /// Obtient ou définit le token actuel.
         /// </summary>
         public string CurrentToken { get; set; }
+
+        /// <summary>
+        /// Obtient ou définit le token actuel.
+        /// </summary>
+        public DateTime? TokenEndDate { get; set; }
 
         /// <summary>
         /// Obtient ou définit l'identifiant de l'utilisateur.
@@ -110,6 +116,29 @@ namespace frontend.Service.Implementation
         }
 
         /// <summary>
+        /// Rafraichit un token.
+        /// </summary>
+        /// <returns>Resultat de la <see cref="Task"/> asynchrone.</returns>
+        public async Task ResfreshToken()
+        {
+            try
+            {
+                using (HttpClient http = new HttpClient())
+                {
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CurrentToken);
+                    var response = await http.GetAsync("https://medieval-warfare.herokuapp.com/users/refresh");
+                    string token = await response.Content.ReadAsStringAsync();
+                    await HandleJwtTokenAsync(token);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Récupère l'utilisateur connecté.
         /// </summary>
         /// <returns>Utilisateur connecté.</returns>
@@ -118,6 +147,16 @@ namespace frontend.Service.Implementation
             if (CurrentToken == null)
             {
                 CurrentToken = await LocalStorageInterop.GetItem(_jsRuntime, "jwt");
+            }
+            if (TokenEndDate == null)
+            {
+                string dateJson = await LocalStorageInterop.GetItem(_jsRuntime, "jwtEndDate");
+                TokenEndDate = !string.IsNullOrWhiteSpace(dateJson) ? JsonSerializer.Deserialize<DateTime?>(dateJson) : null;
+            }
+
+            if (TokenEndDate < DateTime.Now)
+            {
+                await ResfreshToken();
             }
 
             return CurrentToken;
@@ -132,6 +171,12 @@ namespace frontend.Service.Implementation
             if (CurrentToken != null)
             {
                 CurrentToken = await LocalStorageInterop.GetItem(_jsRuntime, "jwt");
+            }
+
+            if (TokenEndDate == null)
+            {
+                string dateJson = await LocalStorageInterop.GetItem(_jsRuntime, "jwtEndDate");
+                TokenEndDate = !string.IsNullOrWhiteSpace(dateJson) ? JsonSerializer.Deserialize<DateTime?>(dateJson) : null;
             }
 
             if (UserConnection == null)
@@ -157,7 +202,7 @@ namespace frontend.Service.Implementation
             {
                 using (HttpClient http = new HttpClient())
                 {
-                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CurrentToken);
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetCurrentToken());
                     var response = await http.GetAsync("https://medieval-warfare.herokuapp.com/users/me");
                     return JsonSerializer.Deserialize<UserConnectionModel>(await response.Content.ReadAsStringAsync());
                 }
@@ -190,6 +235,8 @@ namespace frontend.Service.Implementation
             JwtSecurityToken tokenS = jsonToken as JwtSecurityToken;
 
             CurrentUserId = tokenS.Claims.FirstOrDefault(c => c.Type == "user_id").Value;
+            TokenEndDate = DateTimeHelper.UnixTimeStampToDateTime(int.Parse(tokenS.Claims.FirstOrDefault(c => c.Type == "exp").Value));
+            await LocalStorageInterop.SetItem(_jsRuntime, "jwtEnDate", JsonSerializer.Serialize(TokenEndDate));
 
             if (UserConnection == null)
             {

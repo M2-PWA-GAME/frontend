@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -42,6 +43,11 @@ namespace frontend.Utils.HttpClient
                 var response = await GetAsync(url);
                 string entityJson = await response.Content.ReadAsStringAsync();
 
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("not connected");
+                }
+
                 return JsonSerializer.Deserialize<T>(entityJson);
             }
             catch (Exception e)
@@ -58,6 +64,11 @@ namespace frontend.Utils.HttpClient
                 DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
                 var response = await PostAsync(url, new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json"));
                 string entityJson = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("not connected");
+                }
 
                 return JsonSerializer.Deserialize<TResponse>(entityJson);
             }

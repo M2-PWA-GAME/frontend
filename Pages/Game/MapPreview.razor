@@ -24,6 +24,13 @@
     </div>
 }
 
+@if (IsLoading)
+{
+    <div style="display: flex; justify-content: center; align-items: center">
+        <img src="loader.svg" />
+    </div>
+}
+
 
 
 <div>
@@ -57,6 +64,9 @@
     [Inject]
     public IGameService GameService { get; set; }
 
+    public bool ReloadComponent { get; set; } = true;
+    public bool IsLoading { get; set; } = false;
+
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
     /// initial parameters from its parent in the render tree.
@@ -77,6 +87,12 @@
         XMax = NewXMax;
         YMax = NewYMax;
 
+        Game = null;
+        IsLoading = true;
+        StateHasChanged();
+
+        ReloadComponent = false;
+
         Game = await GameService.GenerateRandomMap(new GameGeneratorModel
         {
             XMax = XMax,
@@ -85,7 +101,19 @@
 
         GameService.InitGame(Game);
 
+        ReloadComponent = true;
+        IsLoading = false;
+
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Returns a flag to indicate whether the component should render.
+    /// </summary>
+    /// <returns></returns>
+    protected override bool ShouldRender()
+    {
+        return ReloadComponent;
     }
 
     public TileModel GetTileAt(int x, int y)
