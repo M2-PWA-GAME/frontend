@@ -18,7 +18,7 @@
         {
             foreach (var gameControllerLastPlayerState in GameController.LastPlayerStates)
             {
-                <div class="player" style="top: @(gameControllerLastPlayerState.Position.Y * 16)px; left: @(gameControllerLastPlayerState.Position.X * 16)px;" @onmouseover="() => GameController.DisplayMouvementAndAttackForPlayerState(gameControllerLastPlayerState)" @onmouseout="GameController.CleanDisplay">
+                <div class="player" style="top: @(gameControllerLastPlayerState.Position.Y * 16)px; left: @(gameControllerLastPlayerState.Position.X * 16)px;" @onmouseover="() => {GameController.DisplayMouvementAndAttackForPlayerState(gameControllerLastPlayerState);GameController.SetSelectedPlayer(gameControllerLastPlayerState);}" @onmouseout="GameController.CleanDisplay">
                     <!-- onmouseover="MouseOverPlayer"  onmouseout="MouseOutPlayer"-->
                     <img alt="Player image" src="@gameControllerLastPlayerState.CharacterImage" style="margin-top: -8px" />
                     @if (!string.IsNullOrWhiteSpace(@gameControllerLastPlayerState.ObjectImage))
@@ -32,22 +32,54 @@
     </div>
     @if (GameModel.Status == GameStatus.PLAYING)
     {
-        @if (!GameController.IsInActions)
-        {
-            <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
-                <img width="16" height="16" src="/img/battle.svg" alt="attack"/>
-            </button>
-            <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
-                <img width="16" height="16" src="/img/boots.svg" alt="move"/>
-            </button>
-        }
+        <div class="row">
+            <div class="col-3">
+                @if (!GameController.IsInActions)
+                {
+                    <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
+                        <img width="16" height="16" src="/img/battle.svg" alt="attack"/>
+                    </button>
+                    <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
+                        <img width="16" height="16" src="/img/boots.svg" alt="move"/>
+                    </button>
+                }
 
-        @if (GameController.IsInActions)
-        {
-            <button name="cancel" class="btn one-click-button" @onclick="@GameController.CancelActions">
-                <span class="oi oi-x" alt="cancel"></span>
-            </button>
-        }
+                @if (GameController.IsInActions)
+                {
+                    <button name="cancel" class="btn one-click-button" @onclick="@GameController.CancelActions">
+                        <span class="oi oi-x" alt="cancel"></span>
+                    </button>
+                }
+            </div>
+            <div class="col-6">
+                @if (GameController.LastSelectedPlayer != null)
+                {
+                    <div class="row">
+                        <div class="col-3">
+                            @if (GameController.LastSelectedPlayer.Id == CurrentUser.Id)
+                            {
+                                <img alt="selected player" src="/img/Characters/Character_16_DOWN.png"/>
+                            }
+                            else
+                            {
+                                <img alt="selected player" src="/img/Characters/CharacterEnemy_16_DOWN.png"/>
+                            }
+                        </div>
+                        <div class="col-6">
+                            <div>
+                                Health @GameController.LastSelectedPlayer.Health
+                            </div>
+                            <div>
+                                Armor @GameController.LastSelectedPlayer.Armor
+                            </div>
+                            <div>
+                                MouvementPointLeft @GameController.LastSelectedPlayer.MouvementPointLeft
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
     }
 }
 

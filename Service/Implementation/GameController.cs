@@ -29,7 +29,14 @@ namespace frontend.Service.Implementation
         public List<PlayerStateModel> LastPlayerStates { get; set; }
 
         public bool IsInActions { get; set; } = false;
-        
+
+        public PlayerStateModel LastSelectedPlayer { get; private set; }
+
+        public void SetSelectedPlayer(PlayerStateModel playerStateModel)
+        {
+            LastSelectedPlayer = playerStateModel;
+        }
+
         public GameController(GameModel game, string userId)
         {
             _game = game;
