@@ -62,9 +62,9 @@ namespace frontend.Service.Implementation
         {
             return await _httpClientMedievalWarfare.PostJsonAsync<ActionModel, GameModel>($"/games/{code}/turn", action);
         }
-        public async Task SendAction(string code, ActionModel action)
+        public async Task<bool> IsUserTurn(string code, string userId)
         {
-            await _httpClientMedievalWarfare.PostJsonAsync<ActionModel, GameModel>($"/games/{code}/turn", action);
+            return await _httpClientMedievalWarfare.GetJsonAsync<bool>($"/games/{code}/turn");
         }
 
         /// <summary>
