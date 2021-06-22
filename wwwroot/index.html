@@ -2,25 +2,25 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=6.0"/>
     <title>Medieval Warfare</title>
-    <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/app.css" rel="stylesheet" />
-    <link href="frontend.styles.css" rel="stylesheet" />
-    <link href="manifest.json" rel="manifest" />
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-    <meta name="theme-color" content="#052767" />
+    <base href="/"/>
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/app.css" rel="stylesheet"/>
+    <link href="frontend.styles.css" rel="stylesheet"/>
+    <link href="manifest.json" rel="manifest"/>
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png"/>
+    <meta name="theme-color" content="#052767"/>
     <meta name="description" content="Medival Warfare game">
 </head>
 
 <body>
-<div id="app">
-    <div style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center">
-        <img src="loader.svg"/>
+    <div id="app">
+        <div style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center">
+            <img src="loader.svg" alt="loader" />
+        </div>
     </div>
-</div>
 
 
     <div id="blazor-error-ui">
@@ -29,14 +29,14 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    <script src="_framework/blazor.webassembly.js"></script>
     <script>
         navigator.serviceWorker.register('service-worker.js');
         if (location.protocol !== "https:") {
             location.protocol = "https:";
         }
     </script>
-    <script src="js/jsInterop.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+<script src="js/jsInterop.js"></script>
 
 </body>
 </html>

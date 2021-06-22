@@ -1,0 +1,169 @@
+﻿
+@inherits frontend.Utils.Component.AuthenticatedComponent
+
+@using frontend.Model
+@using frontend.Model.Game
+@using frontend.Service.Declaration
+@using frontend.Service.Implementation
+@using Microsoft.AspNetCore.Components.Web
+
+<h3>GameCreator</h3>
+
+<div class="row">
+    <div class="col col-6">
+        @if (GameModel?.Map != null)
+        {
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <MapPreview MapModel="@GameModel.Map"></MapPreview>
+                </div>
+        }
+        @if (IsLoading)
+        {
+            <div style="display: flex; justify-content: center; align-items: center">
+                <img src="loader.svg" alt="loader" />
+            </div>
+        }
+    </div>
+    <div class="col col-6">
+        @if (GameModel != null)
+        {
+            <div>
+                Name <input type="text" @bind-value="GameModel.Name" />
+            </div>
+            <div>
+                MaxPlayers <input type="text" @bind-value="GameModel.MaxPlayers" />
+            </div>
+            @if (GameModel.Map != null)
+            {
+                <div>
+                    Seed <input type="text" @bind-value="GameModel.Map.Seed" />
+                </div>
+            }
+        }
+        <div>
+            <input type="text" @bind-value="NewXMax" />
+        </div>
+        <div>
+            <input type="text" @bind-value="NewYMax" />
+        </div>
+        <div>
+            <button class="btn btn-secondary" @onclick="OnReloadClick"> Reload</button>
+            <button class="btn btn-primary" @onclick="OnCreateClick"> Create</button>
+        </div>
+        <div>
+            <input type="text" @bind-value="GameCode" />
+            <button class="btn btn-primary" @onclick="OnJoinClick"> Join</button>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    public GameModel GameModel { get; set; }
+    public GameController GameController { get; set; }
+
+    [Parameter]
+    public int YMax { get; set; }
+
+    public int NewYMax { get; set; }
+
+    [Parameter]
+    public int XMax { get; set; }
+
+    public int NewXMax { get; set; }
+
+    public string GameCode { get; set; }
+
+    [Inject]
+    public IGameService GameService { get; set; }
+
+    public bool ReloadComponent { get; set; } = true;
+
+    public bool IsLoading { get; set; } = false;
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        GameModel = new GameModel
+        {
+            MaxPlayers = 2,
+            Name = "Partie "
+        };
+        NewXMax = XMax;
+        NewYMax = YMax;
+        await ReloadMapAsync();
+    }
+
+    private async Task ReloadMapAsync()
+    {
+        XMax = NewXMax;
+        YMax = NewYMax;
+
+        GameModel.Map = null;
+        IsLoading = true;
+        StateHasChanged();
+
+        ReloadComponent = false;
+
+        var gameMap = await GameService.GenerateRandomMap(new GameGeneratorModel { XMax = XMax, YMax = YMax });
+
+        GameModel.Map = gameMap;
+
+        GameController.InitGame(GameModel);
+
+        ReloadComponent = true;
+        IsLoading = false;
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Returns a flag to indicate whether the component should render.
+    /// </summary>
+    /// <returns></returns>
+    protected override bool ShouldRender()
+    {
+        return ReloadComponent;
+    }
+
+    public TileModel GetTileAt(int x, int y)
+    {
+        return GameModel.Map.Tiles.FirstOrDefault(t => t.Position.X == x && t.Position.Y == y);
+    }
+
+    private async void OnReloadClick(MouseEventArgs obj)
+    {
+        await ReloadMapAsync();
+    }
+
+    private async void OnJoinClick(MouseEventArgs obj)
+    {
+        @if (!string.IsNullOrWhiteSpace(GameCode))
+        {
+            await GameService.JoinGame(GameCode);
+        }
+    }
+
+    private async void OnCreateClick(MouseEventArgs obj)
+    {
+        await GameService.CreateGame(new GameCreateModel
+        {
+            Seed = GameModel.Map.Seed,
+            YMax = GameModel.Map.YMax,
+            XMax = GameModel.Map.XMax,
+            MaxPlayers = GameModel.MaxPlayers,
+            Name = GameModel.Name
+        });
+    }
+
+
+}

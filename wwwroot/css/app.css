@@ -60,6 +60,11 @@ a, .btn-link {
     position: relative;
 }
 
+.map-16 .tile {
+    width: 16px !important;
+    height: 16px !important;
+}
+
 .tile > .object {
     position: absolute;
     top: 0;
@@ -111,3 +116,26 @@ a, .btn-link {
             max-width: 100%;
             max-height: 100%;
         }
+
+.one-click-button {
+    touch-action: manipulation
+}
+
+.attack-sword-left {
+    animation: attack-left 0.4s ease-in-out;
+    position: absolute;
+    top: 0px;
+    left: -12px;
+}
+
+
+@keyframes attack-left {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(-90deg);
+    }
+}
+
