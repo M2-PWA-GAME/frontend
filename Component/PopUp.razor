@@ -1,6 +1,6 @@
 <div class="popUpWrapper @GetPopClassActiv()"/>
 <div class="popUp @GetPopClassActiv()">
-    <span class="popUp__close" @onclick="@ClosePopUp">X</span>
+    <span class="popUp__close oi oi-x" @onclick="@ClosePopUp" aria-hidden="true"/>
     <div class="popUp__content">
         @Content
     </div>
@@ -45,10 +45,14 @@
 .popUp__close{
     width: 30px;
     height: 30px;
-    background-color: red;
+    color: red;
     position: absolute;
     top: 15px;
     right: 15px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
 }
 
 .popUp__content{
