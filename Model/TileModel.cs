@@ -13,6 +13,7 @@ namespace frontend.Model
 
         public string ObjectImage { get; set; }
 
+        [JsonPropertyName("isNavigable")]
         public bool IsNavigable { get; set; }
 
         public string HoverColor { get; set; }
@@ -22,14 +23,5 @@ namespace frontend.Model
 
         [JsonIgnore]
         public GameModel GameModel { get; set; }
-
-        public void OnTileClick()
-        {
-            if (GameModel.PlayerCharacter.IsInMovingMode)
-            {
-                GameModel.PlayerCharacter.MoveTo(this);
-                GameModel.ToggleMoving();
-            }
-        }
     }
 }

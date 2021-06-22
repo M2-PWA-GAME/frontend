@@ -62,7 +62,8 @@ namespace frontend.Utils.HttpClient
             {
                 string jwtToken = await GetToken();
                 DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-                var response = await PostAsync(url, new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json"));
+                string bodyJson = JsonSerializer.Serialize(body);
+                var response = await PostAsync(url, new StringContent(bodyJson, Encoding.UTF8, "application/json"));
                 string entityJson = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)

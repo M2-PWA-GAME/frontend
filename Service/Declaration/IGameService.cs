@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using frontend.Model;
 using frontend.Model.Game;
+using frontend.Model.User;
 
 namespace frontend.Service.Declaration
 {
@@ -22,11 +23,13 @@ namespace frontend.Service.Declaration
         /// Liste les games en cours.
         /// </summary>
         /// <returns>Liste des parties.</returns>
-        Task<List<GameListModel>> ListUserActiveGame();
+        Task<UserGamesModel> ListUserActiveGame();
 
-        void InitGame(GameModel game);
+        void InitGame(GameModel gameCreate);
 
-        Task<GameModel> GenerateRandomMap(GameGeneratorModel generator);
-        Task<GameModel> GenerateRandomMapWithSeed(GameGeneratorModel generator);
+        Task CreateGame(GameCreateModel gameCreate);
+
+        Task<MapModel> GenerateRandomMap(GameGeneratorModel generator);
+        Task<MapModel> GenerateRandomMapWithSeed(GameGeneratorModel generator);
     }
 }

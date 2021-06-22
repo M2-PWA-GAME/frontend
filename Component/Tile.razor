@@ -1,5 +1,7 @@
 ﻿@using frontend.Model
-<div class="tile" @onclick="ActualTile.OnTileClick">
+@using frontend.Model.Game
+
+<div class="tile">
     <div class="hover" style="background-color: @ActualTile.HoverColor; opacity: 0.5">
     </div>
     <div class="object">
@@ -14,6 +16,7 @@
 </div>
 
 @code {
+
     [Parameter]
     public int X { get; set; }
 
@@ -24,7 +27,7 @@
     public TileModel ActualTile { get; set; }
 
     [Parameter]
-    public GameModel Game { get; set; }
+    public GameModel GameModel { get; set; }
 
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
@@ -32,7 +35,7 @@
     /// </summary>
     protected override void OnInitialized()
     {
-        Game.RefreshRequested += Game_OnRefreshRequested;
+        GameModel.RefreshRequested += Game_OnRefreshRequested;
     }
 
     private void Game_OnRefreshRequested()

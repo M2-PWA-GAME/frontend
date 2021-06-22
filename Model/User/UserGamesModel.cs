@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace frontend.Model.Game
+using frontend.Model.Game;
+using frontend.Pages.Game;
+
+namespace frontend.Model.User
 {
-    public class GameListModel
+    public class UserGamesModel
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [JsonPropertyName("status")]
-        public string Status { get; set; }
+        [JsonPropertyName("games")]
+        public List<GameListModel> Games { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using frontend.Model;
 using frontend.Model.Game;
+using frontend.Model.User;
 using frontend.Service.Declaration;
 using frontend.Utils.HttpClient;
 
@@ -34,21 +35,14 @@ namespace frontend.Service.Implementation
         /// <returns>Partie cible.</returns>
         public async Task<GameModel> GetGame(string id)
         {
-            using (HttpClient http = new HttpClient())
-            {
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userService.CurrentToken);
-                var response = await http.GetAsync($"https://medieval-warfare.herokuapp.com/game/{id}");
-                string entityJson = await response.Content.ReadAsStringAsync();
-
-                return JsonSerializer.Deserialize<GameModel>(entityJson);
-            }
+            return await _httpClientMedievalWarfare.GetJsonAsync<GameModel>($"/games/{id}");
         }
 
-        public void InitGame(GameModel game)
+        public void InitGame(GameModel gameCreate)
         {
-            foreach (var tileModel in game.Tiles)
+            foreach (var tileModel in gameCreate.Map.Tiles)
             {
-                tileModel.GameModel = game;
+                tileModel.GameModel = gameCreate;
                 switch (tileModel.Type)
                 {
                     case "GRASS":
@@ -56,12 +50,14 @@ namespace frontend.Service.Implementation
                             tileModel.MapImage = "/img/grass_16.png";
                             break;
                         }
+
                     case "ROCK":
                         {
                             tileModel.MapImage = "/img/grass_16.png";
                             tileModel.ObjectImage = "/img/wood_16.png";
                             break;
                         }
+
                     case "WATER":
                         {
                             tileModel.MapImage = "/img/water_16.png";
@@ -71,30 +67,28 @@ namespace frontend.Service.Implementation
             }
         }
 
-        public async Task<GameModel> GenerateRandomMap(GameGeneratorModel generator)
+        public async Task CreateGame(GameCreateModel gameCreate)
         {
-            return await _httpClientMedievalWarfare.PostJsonAsync<GameGeneratorModel, GameModel>("/maps/random", generator);
+            await _httpClientMedievalWarfare.PostJsonAsync<GameCreateModel, GameJoinModel>("/games", gameCreate);
         }
 
-        public async Task<GameModel> GenerateRandomMapWithSeed(GameGeneratorModel generator)
+        public async Task<MapModel> GenerateRandomMap(GameGeneratorModel generator)
         {
-            return await _httpClientMedievalWarfare.PostJsonAsync<GameGeneratorModel, GameModel>("/maps/seed", generator);
+            return await _httpClientMedievalWarfare.PostJsonAsync<GameGeneratorModel, MapModel>("/maps/random", generator);
+        }
+
+        public async Task<MapModel> GenerateRandomMapWithSeed(GameGeneratorModel generator)
+        {
+            return await _httpClientMedievalWarfare.PostJsonAsync<GameGeneratorModel, MapModel>("/maps/seed", generator);
         }
 
         /// <summary>
         /// Liste les games en cours.
         /// </summary>
         /// <returns>Liste des parties.</returns>
-        public async Task<List<GameListModel>> ListUserActiveGame()
+        public async Task<UserGamesModel> ListUserActiveGame()
         {
-            using (HttpClient http = new HttpClient())
-            {
-                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _userService.CurrentToken);
-                var response = await http.GetAsync($"https://medieval-warfare.herokuapp.com/users/games");
-                string entityJson = await response.Content.ReadAsStringAsync();
-
-                return JsonSerializer.Deserialize<List<GameListModel>>(entityJson);
-            }
+            return await _httpClientMedievalWarfare.GetJsonAsync<UserGamesModel>("/users/games");
         }
     }
 }

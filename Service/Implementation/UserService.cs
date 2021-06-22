@@ -123,12 +123,15 @@ namespace frontend.Service.Implementation
         {
             try
             {
-                using (HttpClient http = new HttpClient())
+                if (!string.IsNullOrWhiteSpace(CurrentToken))
                 {
-                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CurrentToken);
-                    var response = await http.GetAsync("https://medieval-warfare.herokuapp.com/users/refresh");
-                    string token = await response.Content.ReadAsStringAsync();
-                    await HandleJwtTokenAsync(token);
+                    using (HttpClient http = new HttpClient())
+                    {
+                        http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CurrentToken);
+                        var response = await http.GetAsync("https://medieval-warfare.herokuapp.com/users/refresh");
+                        string token = await response.Content.ReadAsStringAsync();
+                        await HandleJwtTokenAsync(token);
+                    }
                 }
             }
             catch (Exception e)
@@ -154,7 +157,7 @@ namespace frontend.Service.Implementation
                 TokenEndDate = !string.IsNullOrWhiteSpace(dateJson) ? JsonSerializer.Deserialize<DateTime?>(dateJson) : null;
             }
 
-            if (TokenEndDate < DateTime.Now)
+            if (TokenEndDate < DateTime.Now || (TokenEndDate == null && CurrentToken != null))
             {
                 await ResfreshToken();
             }
@@ -177,6 +180,11 @@ namespace frontend.Service.Implementation
             {
                 string dateJson = await LocalStorageInterop.GetItem(_jsRuntime, "jwtEndDate");
                 TokenEndDate = !string.IsNullOrWhiteSpace(dateJson) ? JsonSerializer.Deserialize<DateTime?>(dateJson) : null;
+            }
+
+            if (DateTime.Now < TokenEndDate || (TokenEndDate == null && CurrentToken != null))
+            {
+                await ResfreshToken();
             }
 
             if (UserConnection == null)
@@ -213,6 +221,23 @@ namespace frontend.Service.Implementation
                 throw;
             }
         }
+        public async Task<UserConnectionModel> GetUser(string id)
+        {
+            try
+            {
+                using (HttpClient http = new HttpClient())
+                {
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetCurrentToken());
+                    var response = await http.GetAsync($"https://medieval-warfare.herokuapp.com/users/{id}");
+                    return JsonSerializer.Deserialize<UserConnectionModel>(await response.Content.ReadAsStringAsync());
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
 
         private async Task UpdateUser()
         {
@@ -236,7 +261,7 @@ namespace frontend.Service.Implementation
 
             CurrentUserId = tokenS.Claims.FirstOrDefault(c => c.Type == "user_id").Value;
             TokenEndDate = DateTimeHelper.UnixTimeStampToDateTime(int.Parse(tokenS.Claims.FirstOrDefault(c => c.Type == "exp").Value));
-            await LocalStorageInterop.SetItem(_jsRuntime, "jwtEnDate", JsonSerializer.Serialize(TokenEndDate));
+            await LocalStorageInterop.SetItem(_jsRuntime, "jwtEndDate", JsonSerializer.Serialize(TokenEndDate));
 
             if (UserConnection == null)
             {

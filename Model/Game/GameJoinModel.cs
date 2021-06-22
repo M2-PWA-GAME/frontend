@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace frontend.Model.Game
 {
-    public class GameListModel
+    public class GameJoinModel
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -14,7 +14,7 @@ namespace frontend.Model.Game
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("status")]
-        public string Status { get; set; }
+        [JsonPropertyName("joinUrl")]
+        public string JoinUrl { get; set; }
     }
 }

@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace frontend.Model
 {
-    public class GameModel
+    public class GameCreateOldModel
     {
 
         [JsonPropertyName("xmax")]
@@ -17,8 +17,14 @@ namespace frontend.Model
         [JsonPropertyName("seed")]
         public int Seed { get; set; }
 
+        [JsonPropertyName("maxPlayers")]
+        public int MaxPlayers { get; set; }
+
         [JsonPropertyName("tiles")]
         public List<TileModel> Tiles { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
 
         public CharacterModel PlayerCharacter { get; set; }
 

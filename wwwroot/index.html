@@ -16,26 +16,26 @@
 </head>
 
 <body>
-<div id="app">
-    <div style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center">
-        <img src="loader.svg"/>
+    <div id="app">
+        <div style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center">
+            <img src="loader.svg" />
+        </div>
     </div>
-</div>
 
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
 
-<script>
-    navigator.serviceWorker.register('service-worker.js');
-    if (location.protocol !== "https:") {
-        location.protocol = "https:";
-    }
-</script>
-<script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        navigator.serviceWorker.register('service-worker.js');
+        if (location.protocol !== "https:") {
+            location.protocol = "https:";
+        }
+    </script>
+    <script src="_framework/blazor.webassembly.js"></script>
 <script src="js/jsInterop.js"></script>
 
 </body>
