@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -8,6 +9,9 @@ using frontend.Common;
 using frontend.Component;
 using frontend.Model;
 using frontend.Model.Game;
+using frontend.Utils.Interop;
+
+using Microsoft.JSInterop;
 
 namespace frontend.Service.Implementation
 {
@@ -17,9 +21,13 @@ namespace frontend.Service.Implementation
 
         private readonly string _userId;
 
+        private readonly IJSRuntime _jsRuntime;
+
         private bool _isMoving = false;
 
         private bool _isAttacking = false;
+
+        public bool IsPlayerTurn { get; set; }
 
         public bool HasAttacked { get; private set; } = false;
         public bool HasMoved { get; private set; } = false;
@@ -37,16 +45,37 @@ namespace frontend.Service.Implementation
             LastSelectedPlayer = playerStateModel;
         }
 
-        public GameController(GameModel game, string userId)
+        public GameController(GameModel game, string userId, IJSRuntime jsRuntime)
         {
             _game = game;
             _userId = userId;
+            _jsRuntime = jsRuntime;
             InitGame();
+        }
+
+        public async Task EndTurn()
+        {
+            await LocalStorageInterop.SetItem(_jsRuntime, "game_"+ _game.Id, JsonSerializer.Serialize(new GameSaveModel
+                                                                                                          {
+                                                                                                              RoundIndex = GetLastRound().Index,
+                                                                                                              TurnIndex = GetLastRound().Turns.IndexOf(GetLastTurn())
+                                                                                                          }));
+            IsPlayerTurn = false;
         }
 
         private PlayerStateModel GetLastPlayerStateForUser(string userId)
         {
             return _game.Rounds.OrderBy(r => r.Index).LastOrDefault()?.Turns.LastOrDefault()?.PlayerStates.Single(ps => ps.Id == userId);
+        }
+
+        private TurnModel GetLastTurn()
+        {
+            return _game.Rounds.OrderBy(r => r.Index).LastOrDefault()?.Turns.LastOrDefault();
+        }
+
+        private RoundModel GetLastRound()
+        {
+            return _game.Rounds.OrderBy(r => r.Index).LastOrDefault();
         }
 
         private List<PlayerStateModel> GetLastPlayerState()

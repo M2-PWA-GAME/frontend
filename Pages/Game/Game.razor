@@ -42,6 +42,9 @@
                     <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
                         <img width="16" height="16" src="/img/boots.svg" alt="move"/>
                     </button>
+                    <button name="endTurn" class="btn one-click-button" @onclick="@GameController.EndTurn">
+                        <img width="16" height="16" src="/img/end-turn.svg" alt="End Turn"/>
+                    </button>
                 }
 
                 @if (GameController.IsInActions)
@@ -98,6 +101,9 @@
     [Inject]
     public IGameService GameService { get; set; }
 
+    [Inject]
+    public IJSRuntime JsRuntime { get; set; }
+
     public GameController GameController { get; set; }
 
     public List<UserConnectionModel> Users { get; set; } = new List<UserConnectionModel>();
@@ -115,7 +121,7 @@
 
         GameModel = await GameService.GetGame(Code);
 
-        GameController = new GameController(GameModel, CurrentUser.Id);
+        GameController = new GameController(GameModel, CurrentUser.Id, JsRuntime);
 
         foreach (var userId in GameModel.Users)
         {
