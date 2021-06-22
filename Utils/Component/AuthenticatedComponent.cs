@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 
+using frontend.Model.User;
 using frontend.Service.Declaration;
 
 using Microsoft.AspNetCore.Components;
@@ -17,6 +18,11 @@ namespace frontend.Utils.Component
         [Inject]
         public IUserService UserService { get; set; }
 
+        public UserConnectionModel CurrentUser { get; set; }
+
+        [Inject]
+        public NavigationManager NavManager { get; set; }
+
         /// <summary>
         /// Method invoked when the component is ready to start, having received its
         /// initial parameters from its parent in the render tree.
@@ -24,9 +30,14 @@ namespace frontend.Utils.Component
         /// want the component to refresh when that operation is completed.
         /// </summary>
         /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
-        protected override Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
-            return base.OnInitializedAsync();
+            CurrentUser = await UserService.GetCurrentUser();
+            if (CurrentUser == null)
+            {
+                NavManager.NavigateTo("/user/signin");
+            }
+            await base.OnInitializedAsync();
         }
     }
 }

@@ -17,8 +17,8 @@ namespace frontend.Model.Game
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("statut")]
-        public string Statut { get; set; }
+        [JsonPropertyName("status")]
+        public string Status { get; set; }
 
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -31,14 +31,7 @@ namespace frontend.Model.Game
 
         [JsonPropertyName("weapons")]
         public List<WeaponModel> Weapons { get; set; }
-
-        public event Action RefreshRequested;
-
-        public void CallRequestRefresh()
-        {
-            RefreshRequested?.Invoke();
-        }
-
+        
     }
 
     public class RoundModel
@@ -62,7 +55,7 @@ namespace frontend.Model.Game
         public string PlayerId { get; set; }
 
         [JsonPropertyName("playersStates")]
-        public List<PlayerStateModel> PLayerStates { get; set; }
+        public List<PlayerStateModel> PlayerStates { get; set; }
     }
 
     public class PlayerStateModel
@@ -81,6 +74,15 @@ namespace frontend.Model.Game
 
         [JsonPropertyName("weapon")]
         public WeaponModel Weapon { get; set; }
+
+        [JsonIgnore]
+        public int MouvementPointLeft { get; set; }
+
+        [JsonIgnore]
+        public string CharacterImage { get; set; }
+
+        [JsonIgnore]
+        public string ObjectImage { get; set; }
     }
 
     public class WeaponModel

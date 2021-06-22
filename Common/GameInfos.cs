@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace frontend.Common
 {
-    public class GameStatus
+    public class GameInfos
     {
-        public const string WAITING = "WAITING";
-        public const string PLAYING = "PLAYING";
+        public const int PLAYER_MOUVEMENT = 4;
     }
 }

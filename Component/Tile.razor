@@ -1,17 +1,18 @@
 ﻿@using frontend.Model
 @using frontend.Model.Game
+@using frontend.Service.Implementation
 
-<div class="tile">
+<div class="tile" @onclick="() => GameController.TileClick(ActualTile)">
     <div class="hover" style="background-color: @ActualTile.HoverColor; opacity: 0.5">
     </div>
     <div class="object">
         @if (!string.IsNullOrWhiteSpace(ActualTile.ObjectImage))
         {
-            <img alt="Object image" src="@ActualTile.ObjectImage"/>
+            <img alt="Object image" src="@ActualTile.ObjectImage" style="margin-top: -8px"/>
         }
     </div>
     <div class="floor">
-        <img alt="Map image" src="@ActualTile.MapImage" />
+        <img alt="Map image" src="@ActualTile.MapImage" style="margin-top: -8px" />
     </div>
 </div>
 
@@ -27,7 +28,7 @@
     public TileModel ActualTile { get; set; }
 
     [Parameter]
-    public GameModel GameModel { get; set; }
+    public GameController GameController { get; set; }
 
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
@@ -35,7 +36,10 @@
     /// </summary>
     protected override void OnInitialized()
     {
-        GameModel.RefreshRequested += Game_OnRefreshRequested;
+        if (GameController != null)
+        {
+            GameController.RefreshRequested += Game_OnRefreshRequested;
+        }
     }
 
     private void Game_OnRefreshRequested()

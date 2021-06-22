@@ -37,36 +37,7 @@ namespace frontend.Service.Implementation
         {
             return await _httpClientMedievalWarfare.GetJsonAsync<GameModel>($"/games/{id}");
         }
-
-        public void InitGame(GameModel gameCreate)
-        {
-            foreach (var tileModel in gameCreate.Map.Tiles)
-            {
-                tileModel.GameModel = gameCreate;
-                switch (tileModel.Type)
-                {
-                    case "GRASS":
-                        {
-                            tileModel.MapImage = "/img/grass_16.png";
-                            break;
-                        }
-
-                    case "ROCK":
-                        {
-                            tileModel.MapImage = "/img/grass_16.png";
-                            tileModel.ObjectImage = "/img/wood_16.png";
-                            break;
-                        }
-
-                    case "WATER":
-                        {
-                            tileModel.MapImage = "/img/water_16.png";
-                            break;
-                        }
-                }
-            }
-        }
-
+        
         public async Task CreateGame(GameCreateModel gameCreate)
         {
             await _httpClientMedievalWarfare.PostJsonAsync<GameCreateModel, GameJoinModel>("/games", gameCreate);
@@ -80,6 +51,11 @@ namespace frontend.Service.Implementation
         public async Task<MapModel> GenerateRandomMapWithSeed(GameGeneratorModel generator)
         {
             return await _httpClientMedievalWarfare.PostJsonAsync<GameGeneratorModel, MapModel>("/maps/seed", generator);
+        }
+
+        public async Task JoinGame(string code)
+        {
+            await _httpClientMedievalWarfare.GetJsonAsync<object>($"/games/join/{code}");
         }
 
         /// <summary>

@@ -16,5 +16,7 @@ namespace frontend.Service.Declaration
         Task<UserConnectionModel> GetCurrentUser();
 
         Task<UserConnectionModel> GetUser(string id);
+
+        string GetCurrentUserId();
     }
 }

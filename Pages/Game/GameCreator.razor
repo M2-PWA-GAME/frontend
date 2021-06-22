@@ -1,17 +1,11 @@
-﻿@using System.Net.Http
-@using System.Net.Http.Json
-@using frontend
-@using frontend.Component
+﻿
+@inherits frontend.Utils.Component.AuthenticatedComponent
+
 @using frontend.Model
 @using frontend.Model.Game
 @using frontend.Service.Declaration
-@using frontend.Shared
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Routing
+@using frontend.Service.Implementation
 @using Microsoft.AspNetCore.Components.Web
-@using Microsoft.AspNetCore.Components.Web.Virtualization
-@using Microsoft.AspNetCore.Components.WebAssembly.Http
-@using Microsoft.JSInterop
 
 <h3>GameCreator</h3>
 
@@ -19,12 +13,14 @@
     <div class="col col-6">
         @if (GameModel?.Map != null)
         {
-            <MapPreview MapModel="@GameModel.Map" GameModel="@GameModel"></MapPreview>
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <MapPreview MapModel="@GameModel.Map"></MapPreview>
+                </div>
         }
         @if (IsLoading)
         {
             <div style="display: flex; justify-content: center; align-items: center">
-                <img src="loader.svg"/>
+                <img src="loader.svg" alt="loader" />
             </div>
         }
     </div>
@@ -54,6 +50,10 @@
             <button class="btn btn-secondary" @onclick="OnReloadClick"> Reload</button>
             <button class="btn btn-primary" @onclick="OnCreateClick"> Create</button>
         </div>
+        <div>
+            <input type="text" @bind-value="GameCode" />
+            <button class="btn btn-primary" @onclick="OnJoinClick"> Join</button>
+        </div>
     </div>
 </div>
 
@@ -61,6 +61,7 @@
 
 @code {
     public GameModel GameModel { get; set; }
+    public GameController GameController { get; set; }
 
     [Parameter]
     public int YMax { get; set; }
@@ -71,6 +72,8 @@
     public int XMax { get; set; }
 
     public int NewXMax { get; set; }
+
+    public string GameCode { get; set; }
 
     [Inject]
     public IGameService GameService { get; set; }
@@ -88,6 +91,8 @@
     /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         GameModel = new GameModel
         {
             MaxPlayers = 2,
@@ -95,7 +100,6 @@
         };
         NewXMax = XMax;
         NewYMax = YMax;
-        await base.OnInitializedAsync();
         await ReloadMapAsync();
     }
 
@@ -114,7 +118,7 @@
 
         GameModel.Map = gameMap;
 
-        GameService.InitGame(GameModel);
+        GameController.InitGame(GameModel);
 
         ReloadComponent = true;
         IsLoading = false;
@@ -139,6 +143,14 @@
     private async void OnReloadClick(MouseEventArgs obj)
     {
         await ReloadMapAsync();
+    }
+
+    private async void OnJoinClick(MouseEventArgs obj)
+    {
+        @if (!string.IsNullOrWhiteSpace(GameCode))
+        {
+            await GameService.JoinGame(GameCode);
+        }
     }
 
     private async void OnCreateClick(MouseEventArgs obj)

@@ -1,20 +1,54 @@
 ﻿@page "/games/{code}"
-@using frontend.Service.Declaration
-@using frontend.Model
+
+@inherits frontend.Utils.Component.AuthenticatedComponent
+
+@using frontend.Common
 @using frontend.Model.Game
 @using frontend.Model.User
-@using frontend.Common
+@using frontend.Service.Declaration
+@using frontend.Service.Implementation
 
-<h3>Game @(GameModel?.Statut == GameStatus.WAITING ? "Waiting" : "Active") | @GameModel?.Statut</h3>
+<h3>Game @(GameModel?.Status == GameStatus.WAITING ? "Waiting" : "Playing") | @GameModel?.Status</h3>
 @if (GameModel?.Map != null)
 {
-    <MapPreview MapModel="@GameModel.Map" GameModel="@GameModel"></MapPreview>
-                                                                @if (GameModel.Statut == GameStatus.ACTIVE)
-                                                                {
-                                                                    <button class="btn">
+    <div style="position: relative">
+        <MapPreview MapModel="@GameModel.Map" GameController="@GameController" ></MapPreview>
+    
+        @if (GameModel != null && GameModel.Status == GameStatus.PLAYING)
+        {
+            foreach (var gameControllerLastPlayerState in GameController.LastPlayerStates)
+            {
+                <div class="player" style="top: @(gameControllerLastPlayerState.Position.Y * 16)px; left: @(gameControllerLastPlayerState.Position.X * 16)px;" @onmouseover="() => GameController.DisplayMouvementAndAttackForPlayerState(gameControllerLastPlayerState)" @onmouseout="GameController.CleanDisplay">
+                    <!-- onmouseover="MouseOverPlayer"  onmouseout="MouseOutPlayer"-->
+                    <img alt="Player image" src="@gameControllerLastPlayerState.CharacterImage" style="margin-top: -8px" />
+                    @if (!string.IsNullOrWhiteSpace(@gameControllerLastPlayerState.ObjectImage))
+                    {
+                        <img alt="object image" class="attack-sword-left" src="@gameControllerLastPlayerState.ObjectImage" />
+                    }
+                </div>
+            }
+        }
 
-                                                                    </button>
-                                                                }
+    </div>
+    @if (GameModel.Status == GameStatus.PLAYING)
+    {
+        @if (!GameController.IsInActions)
+        {
+            <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
+                <img width="16" height="16" src="/img/battle.svg" alt="attack"/>
+            </button>
+            <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
+                <img width="16" height="16" src="/img/boots.svg" alt="move"/>
+            </button>
+        }
+
+        @if (GameController.IsInActions)
+        {
+            <button name="cancel" class="btn one-click-button" @onclick="@GameController.CancelActions">
+                <span class="oi oi-x" alt="cancel"></span>
+            </button>
+        }
+    }
 }
 
 <h3> Users : </h3>
@@ -32,8 +66,7 @@
     [Inject]
     public IGameService GameService { get; set; }
 
-    [Inject]
-    public IUserService UserService { get; set; }
+    public GameController GameController { get; set; }
 
     public List<UserConnectionModel> Users { get; set; } = new List<UserConnectionModel>();
 
@@ -46,17 +79,27 @@
     /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
 
         GameModel = await GameService.GetGame(Code);
 
-        GameService.InitGame(GameModel);
+        GameController = new GameController(GameModel, CurrentUser.Id);
 
         foreach (var userId in GameModel.Users)
         {
             Users.Add(await UserService.GetUser(userId));
         }
 
-        await base.OnInitializedAsync();
+        if (GameController != null)
+        {
+            GameController.RefreshRequested += Game_OnRefreshRequested;
+        }
     }
 
+
+
+    private void Game_OnRefreshRequested()
+    {
+        StateHasChanged();
+    }
 }

@@ -162,6 +162,11 @@ namespace frontend.Service.Implementation
                 await ResfreshToken();
             }
 
+            if (CurrentToken == null)
+            {
+                await ResetJwtAsync();
+            }
+
             return CurrentToken;
         }
 
@@ -171,7 +176,7 @@ namespace frontend.Service.Implementation
         /// <returns>Utilisateur connecté.</returns>
         public async Task<UserConnectionModel> GetCurrentUser()
         {
-            if (CurrentToken != null)
+            if (CurrentToken == null)
             {
                 CurrentToken = await LocalStorageInterop.GetItem(_jsRuntime, "jwt");
             }
@@ -182,7 +187,7 @@ namespace frontend.Service.Implementation
                 TokenEndDate = !string.IsNullOrWhiteSpace(dateJson) ? JsonSerializer.Deserialize<DateTime?>(dateJson) : null;
             }
 
-            if (DateTime.Now < TokenEndDate || (TokenEndDate == null && CurrentToken != null))
+            if (TokenEndDate < DateTime.Now || (TokenEndDate == null && CurrentToken != null))
             {
                 await ResfreshToken();
             }
@@ -197,7 +202,13 @@ namespace frontend.Service.Implementation
             {
                 await UpdateUser();
             }
-            return UserConnection;
+
+            if (CurrentToken == null)
+            {
+                await ResetJwtAsync();
+            }
+
+            return CurrentToken == null ? null : UserConnection;
         }
 
         /// <summary>
@@ -210,9 +221,10 @@ namespace frontend.Service.Implementation
             {
                 using (HttpClient http = new HttpClient())
                 {
-                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetCurrentToken());
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CurrentToken);
                     var response = await http.GetAsync("https://medieval-warfare.herokuapp.com/users/me");
-                    return JsonSerializer.Deserialize<UserConnectionModel>(await response.Content.ReadAsStringAsync());
+                    string json = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<UserConnectionModel>(json);
                 }
             }
             catch (Exception e)
@@ -239,6 +251,11 @@ namespace frontend.Service.Implementation
             }
         }
 
+        public string GetCurrentUserId()
+        {
+            return CurrentUserId;
+        }
+
         private async Task UpdateUser()
         {
             UserConnection = await MeAsync();
@@ -255,19 +272,42 @@ namespace frontend.Service.Implementation
             CurrentToken = token; 
             await LocalStorageInterop.SetItem(_jsRuntime, "jwt", CurrentToken);
 
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            SecurityToken jsonToken = handler.ReadToken(CurrentToken);
-            JwtSecurityToken tokenS = jsonToken as JwtSecurityToken;
-
-            CurrentUserId = tokenS.Claims.FirstOrDefault(c => c.Type == "user_id").Value;
-            TokenEndDate = DateTimeHelper.UnixTimeStampToDateTime(int.Parse(tokenS.Claims.FirstOrDefault(c => c.Type == "exp").Value));
-            await LocalStorageInterop.SetItem(_jsRuntime, "jwtEndDate", JsonSerializer.Serialize(TokenEndDate));
-
-            if (UserConnection == null)
+            if (!string.IsNullOrWhiteSpace(CurrentToken))
             {
-                await UpdateUser();
-                UserConnection.Password = null;
-                await LocalStorageInterop.SetItem(_jsRuntime, "user", JsonSerializer.Serialize(UserConnection));
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                SecurityToken jsonToken = handler.ReadToken(CurrentToken);
+                JwtSecurityToken tokenS = jsonToken as JwtSecurityToken;
+
+                CurrentUserId = tokenS.Claims.FirstOrDefault(c => c.Type == "user_id").Value;
+                TokenEndDate = DateTimeHelper.UnixTimeStampToDateTime(int.Parse(tokenS.Claims.FirstOrDefault(c => c.Type == "exp").Value));
+                await LocalStorageInterop.SetItem(_jsRuntime, "jwtEndDate", JsonSerializer.Serialize(TokenEndDate));
+
+                if (UserConnection == null)
+                {
+                    await UpdateUser();
+                    UserConnection.Password = null;
+                    await LocalStorageInterop.SetItem(_jsRuntime, "user", JsonSerializer.Serialize(UserConnection));
+                }
+            }
+            else
+            {
+                await ResetJwtAsync();
+            }
+        }
+
+        private async Task ResetJwtAsync()
+        {
+            var localStorageToken = await LocalStorageInterop.GetItem(_jsRuntime, "jwt");
+            Console.WriteLine($"ResetJwtAsync | CurrentToken: {CurrentToken}, LocalStorage: {localStorageToken}");
+            if (string.IsNullOrWhiteSpace(CurrentToken) && string.IsNullOrWhiteSpace(localStorageToken))
+            {
+                Console.WriteLine($"ResetJwtAsync | CLEANED");
+                CurrentToken = null;
+                CurrentUserId = null;
+                UserConnection = null;
+                await LocalStorageInterop.SetItem(_jsRuntime, "user", null);
+                await LocalStorageInterop.SetItem(_jsRuntime, "jwtEndDate", null);
+                await LocalStorageInterop.SetItem(_jsRuntime, "jwt", null);
             }
         }
     }

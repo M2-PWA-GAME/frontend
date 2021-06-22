@@ -25,11 +25,11 @@ namespace frontend.Service.Declaration
         /// <returns>Liste des parties.</returns>
         Task<UserGamesModel> ListUserActiveGame();
 
-        void InitGame(GameModel gameCreate);
-
         Task CreateGame(GameCreateModel gameCreate);
 
         Task<MapModel> GenerateRandomMap(GameGeneratorModel generator);
         Task<MapModel> GenerateRandomMapWithSeed(GameGeneratorModel generator);
+
+        Task JoinGame(string code);
     }
 }
