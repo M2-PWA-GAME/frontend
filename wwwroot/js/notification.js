@@ -1,16 +1,16 @@
 navigator.serviceWorker.addEventListener('message', event => {
-    if (event.data === 'newData') {
-      console.log(event.data);
-      displayNotification(event.data);
-    }
+    console.log(event);
+    console.log(event.data);
+    displayNotification(event.data.firebaseMessaging.payload.notification, event.data.firebaseMessaging.payload.data);
+
   });
 
-function displayNotification(data){
+function displayNotification(notification, data){
 
-  const notificationTitle = data.title
+  const notificationTitle = notification.title
   const notificationOptions = {
     icon: "/icon-512.png",
-    body: data.body
+    body: notification.body
   }
 
   var myNotification = new Notification(notificationTitle, notificationOptions );
