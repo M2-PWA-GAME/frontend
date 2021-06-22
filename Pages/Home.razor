@@ -1,0 +1,76 @@
+﻿@page "/home"
+@using frontend.Model
+@using System.Security.Cryptography.X509Certificates
+@using Blazored.LocalStorage
+
+<h1>Liste des parties</h1>
+<PixelButton title="Bouton 2" color="#37d6c8" width="60px" OnClickCallback="@OpenOtherPopUp"/>
+<PixelButton title="Autre button" color="red" OnClickCallback="@OpenPopUp"/>
+<GameCard gameLink="/game/efwunewf" gameName="Donjon de ces morts"/>
+<GameCard gameLink="/game/djewkmd" gameName="La fete au marais"/>  
+@* <GameCard gameLink="/game/djewkmd" gameName="An other one bite the dust"/> *@
+
+<PopUp @bind-DisplayPopUp="@DisplayTestPopUp">
+    <Content>
+        <p>Test</p>
+    </Content>
+    <Action>
+        <button>Test</button>
+    </Action>
+</PopUp>
+
+<PopUp @bind-DisplayPopUp="@DisplayOtherPopUp">
+    <Content>
+        <p>Une autre popUp</p>
+    </Content>
+    <Action>
+        <button>Autre</button>
+    </Action>
+</PopUp>
+
+<div class="bottomActions">
+    <CustomButton title="Cree partie" full="true" OnClickCallback="@CreateGame"/>
+    <CustomButton title="Rejoindre partie" full="false" OnClickCallback="@CJoinGame"/>   
+</div>
+<p>
+    @message
+</p>
+
+<style>
+    .bottomActions{
+        position: absolute;
+        background-color: #F5F5F5;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        justify-content: center;
+    }
+
+    .bottomActions .customButton{
+        width: 150px;
+    }
+</style>
+
+@code{
+    public String message;
+
+    public Boolean DisplayTestPopUp = false;
+    public Boolean DisplayOtherPopUp = false;
+
+    private void OpenPopUp() {
+        DisplayTestPopUp = true;
+    }
+
+    private void OpenOtherPopUp() {
+        DisplayOtherPopUp = true;
+    }
+
+    
+    private void CreateGame(){
+    }
+    private void CJoinGame(){
+    }
+}

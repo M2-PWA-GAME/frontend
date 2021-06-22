@@ -1,0 +1,47 @@
+﻿@page "/"
+@using frontend.Model
+@using System.Security.Cryptography.X509Certificates
+@using Blazored.LocalStorage
+@inject NavigationManager NavigationManager
+@layout NotConnectedLayout
+
+<section  class="logPortal">
+    <h1>Nom de l'application</h1>
+    <div class="redirectButtons">
+        <CustomButton title="Connexion" full="true" OnClickCallback="@RedirectToLogin"/>
+        <CustomButton title="Inscription" OnClickCallback="@RedirectToRegister"/>
+    </div>
+</section>
+
+<style>
+    
+.logPortal h1 {
+    display: inline-block;
+    width: calc(100% - 60px);
+    text-align: center;
+    font-size: 2.7em;
+    padding: 20px 30px;
+    margin: clamp(100px, 20vh, 20vh) 0;
+}
+.logPortal .redirectButtons {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    margin: clamp(20px, 5vh, 200px) 0;
+}
+</style>
+
+@code{
+    private void RedirectToRegister(){
+        RedirectTo("register");
+    }
+    private void RedirectToLogin(){
+        RedirectTo("login");
+    }
+    private void RedirectTo(String redirecton)
+    {
+        NavigationManager.NavigateTo(redirecton);
+    }
+}

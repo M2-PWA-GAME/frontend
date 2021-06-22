@@ -1,0 +1,45 @@
+@page "/user"
+@using frontend.Service.Declaration
+@using frontend.Model.User
+@using frontend.Service.Implementation
+
+
+<h3>User</h3>
+@if(CurrentUser!=null)
+{
+    <p>@CurrentUser.UserName</p>
+}
+else{
+    <NavLink href="/login" Match="NavLinkMatch.All">
+        <p>Se connecter</p>
+    </NavLink>
+}
+
+
+@code
+{
+    [Inject]
+    public IUserService UserService { get; set; }
+
+    public UserConnectionModel CurrentUser = null;
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        CurrentUser = await UserService.GetCurrentUser();
+        ((UserService)UserService).UserChanged += UserChangedHandler;
+    }
+
+    private async void UserChangedHandler()
+    {
+        CurrentUser = await UserService.GetCurrentUser();
+    }
+}

@@ -1,0 +1,59 @@
+@using frontend.Model
+
+<div class="customButton @GetButtonFullClass()" @onclick="OnClickCallback">
+  @title 
+</div>
+
+
+<style>
+.customButton {
+  display: flex;
+  padding: 15px 20px;
+  margin: 20px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 1.2em;
+  color: black;
+  background-color: white;
+  border: 1px solid black;
+  transition: 0.2s ease-in-out;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+}
+.customButton:hover {
+  color: white;
+  background-color: darkgray;
+}
+
+.customButton--full {
+  color: white;
+  background-color: black;
+}
+.customButton--full:hover {
+  color: white;
+  background-color: darkgray;
+}
+</style>
+
+
+@code {
+    [Parameter]
+    public String title { get; set; }
+
+    [Parameter]
+    public Boolean full { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnClickCallback { get; set; }
+    
+    private String GetButtonFullClass()
+    {
+        if(full){
+            return "customButton--full";
+        }else{
+            return null;
+        }
+    }
+
+}
