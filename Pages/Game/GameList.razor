@@ -1,4 +1,5 @@
 ﻿@page "/games"
+@page "/"
 @using frontend.Service.Declaration
 @using frontend.Model
 @using frontend.Model.Game
@@ -14,23 +15,23 @@
 
 @if (UserGames != null && UserGames.Games.Count > 0)
 {
-    @foreach (var game in UserGames.Games)
+@foreach (var game in UserGames.Games)
     {
-        <div>
-            <a href="/games/@game.Id">Partie : @game.Name</a>
-        </div>
+<div>
+    <a href="/games/@game.Id">Partie : @game.Name</a>
+</div>
     }
 }
 else
 {
-    <div>Pas de partie en cours</div>
+<div>Pas de partie en cours</div>
 }
 
 
 @code {
 
     /// <summary>
-    /// Obtient ou définit 
+    /// Obtient ou définit
     /// </summary>
     [Inject]
     public IGameService GameService { get; set; }

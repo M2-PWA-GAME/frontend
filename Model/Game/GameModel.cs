@@ -31,7 +31,9 @@ namespace frontend.Model.Game
 
         [JsonPropertyName("weapons")]
         public List<WeaponModel> Weapons { get; set; }
-        
+
+        [JsonPropertyName("turnOrder")]
+        public Dictionary<int, string> UserTurns { get; set; }
     }
 
     public class RoundModel

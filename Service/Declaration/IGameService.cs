@@ -31,5 +31,7 @@ namespace frontend.Service.Declaration
         Task<MapModel> GenerateRandomMapWithSeed(GameGeneratorModel generator);
 
         Task JoinGame(string code);
+
+        Task<GameModel> SendAction(string code, ActionModel action);
     }
 }

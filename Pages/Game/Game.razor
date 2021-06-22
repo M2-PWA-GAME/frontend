@@ -36,24 +36,30 @@
             <div class="col-3">
                 @if (!GameController.IsInActions)
                 {
-                    <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
-                        <img width="16" height="16" src="/img/battle.svg" alt="attack"/>
-                    </button>
-                    <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
-                        <img width="16" height="16" src="/img/boots.svg" alt="move"/>
-                    </button>
+                    @if (!GameController.HasAttacked)
+                    {
+                        <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
+                            <img width="16" height="16" src="/img/battle.svg" alt="attack" />
+                        </button>
+                    }
+                    @if (!GameController.HasMoved)
+                    {
+                        <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
+                            <img width="16" height="16" src="/img/boots.svg" alt="move"/>
+                        </button>
+                    }
                     <button name="endTurn" class="btn one-click-button" @onclick="@GameController.EndTurn">
-                        <img width="16" height="16" src="/img/end-turn.svg" alt="End Turn"/>
-                    </button>
-                }
+                            <img width="16" height="16" src="/img/end-turn.svg" alt="End Turn" />
+                        </button>
+                    }
 
-                @if (GameController.IsInActions)
-                {
-                    <button name="cancel" class="btn one-click-button" @onclick="@GameController.CancelActions">
-                        <span class="oi oi-x" alt="cancel"></span>
-                    </button>
-                }
-            </div>
+                    @if (GameController.IsInActions)
+                    {
+                        <button name="cancel" class="btn one-click-button" @onclick="@GameController.CancelActions">
+                            <span class="oi oi-x" alt="cancel"></span>
+                        </button>
+                    }
+                </div>
             <div class="col-6">
                 @if (GameController.LastSelectedPlayer != null)
                 {
@@ -121,7 +127,7 @@
 
         GameModel = await GameService.GetGame(Code);
 
-        GameController = new GameController(GameModel, CurrentUser.Id, JsRuntime);
+        GameController = new GameController(GameModel, CurrentUser.Id, JsRuntime, GameService);
 
         foreach (var userId in GameModel.Users)
         {

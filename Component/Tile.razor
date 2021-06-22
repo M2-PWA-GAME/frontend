@@ -2,7 +2,7 @@
 @using frontend.Model.Game
 @using frontend.Service.Implementation
 
-<div class="tile" @onclick="() => GameController.TileClick(ActualTile)">
+<div class="tile" @onclick="async () => { if (GameController != null){ await GameController.TileClick(ActualTile); }}">
     <div class="hover" style="background-color: @ActualTile.HoverColor; opacity: 0.5">
     </div>
     <div class="object">
