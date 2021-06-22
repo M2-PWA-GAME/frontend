@@ -18,7 +18,7 @@
         {
             foreach (var gameControllerLastPlayerState in GameController.LastPlayerStates)
             {
-                <div class="player" style="top: @(gameControllerLastPlayerState.Position.Y * 16)px; left: @(gameControllerLastPlayerState.Position.X * 16)px;" @onmouseover="() => {GameController.DisplayMouvementAndAttackForPlayerState(gameControllerLastPlayerState);GameController.SetSelectedPlayer(gameControllerLastPlayerState);}" @onmouseout="GameController.CleanDisplay">
+                <div class="player" @onclick="() => GameController.OnPlayerClick(gameControllerLastPlayerState)" style="top: @(gameControllerLastPlayerState.Position.Y * 16)px; left: @(gameControllerLastPlayerState.Position.X * 16)px;" @onmouseover="() => {GameController.DisplayMouvementAndAttackForPlayerState(gameControllerLastPlayerState);GameController.SetSelectedPlayer(gameControllerLastPlayerState);}" @onmouseout="GameController.CleanDisplay">
                     <!-- onmouseover="MouseOverPlayer"  onmouseout="MouseOutPlayer"-->
                     <img alt="Player image" src="@gameControllerLastPlayerState.CharacterImage" style="margin-top: -8px" />
                     @if (!string.IsNullOrWhiteSpace(@gameControllerLastPlayerState.ObjectImage))
@@ -34,22 +34,24 @@
     {
         <div class="row">
             <div class="col-3">
-                @if (!GameController.IsInActions)
+                @if (GameController.IsUserTurn)
                 {
-                    @if (!GameController.HasAttacked)
+                    @if (!GameController.IsInActions)
                     {
-                        <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
-                            <img width="16" height="16" src="/img/battle.svg" alt="attack" />
-                        </button>
-                    }
-                    @if (!GameController.HasMoved)
-                    {
-                        <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
-                            <img width="16" height="16" src="/img/boots.svg" alt="move"/>
-                        </button>
-                    }
-                    <button name="endTurn" class="btn one-click-button" @onclick="@GameController.EndTurn">
-                            <img width="16" height="16" src="/img/end-turn.svg" alt="End Turn" />
+                        @if (!GameController.HasAttacked)
+                        {
+                            <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
+                                <img width="16" height="16" src="/img/battle.svg" alt="attack"/>
+                            </button>
+                        }
+                        @if (!GameController.HasMoved)
+                        {
+                            <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
+                                <img width="16" height="16" src="/img/boots.svg" alt="move"/>
+                            </button>
+                        }
+                        <button name="endTurn" class="btn one-click-button" @onclick="@GameController.EndTurn">
+                            <img width="16" height="16" src="/img/end-turn.svg" alt="End Turn"/>
                         </button>
                     }
 
@@ -59,7 +61,8 @@
                             <span class="oi oi-x" alt="cancel"></span>
                         </button>
                     }
-                </div>
+                }
+            </div>
             <div class="col-6">
                 @if (GameController.LastSelectedPlayer != null)
                 {
@@ -128,6 +131,7 @@
         GameModel = await GameService.GetGame(Code);
 
         GameController = new GameController(GameModel, CurrentUser.Id, JsRuntime, GameService);
+        await GameController.InitGameAsync();
 
         foreach (var userId in GameModel.Users)
         {
