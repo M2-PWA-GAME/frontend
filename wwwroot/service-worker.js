@@ -33,4 +33,4 @@ self.addEventListener('push', async event => {
         client.postMessage('newData');
       }
     };
-  });
+});

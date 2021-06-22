@@ -1,9 +1,24 @@
 navigator.serviceWorker.addEventListener('message', event => {
-    console.log(event);
     if (event.data === 'newData') {
-      showData();
+      console.log(event.data);
+      displayNotification(event.data);
     }
   });
+
+function displayNotification(data){
+
+  const notificationTitle = data.title
+  const notificationOptions = {
+    icon: "/icon-512.png",
+    body: data.body
+  }
+
+  var myNotification = new Notification(notificationTitle, notificationOptions );
+
+  myNotification.onclick = function(event) {
+    window.location.href = '/game/' + data.gameId;
+  }
+}
 
   
 (async ()=>{ 
@@ -16,6 +31,7 @@ async function initNotification() {
   const messaging = await setUpFirebaseMessagingService();
   await requestPermission(messaging);
   await sendToken(messaging);
+  onTokenRefresh(messaging);
 }
 
 function initialiseFirebaseApp() {
@@ -47,12 +63,40 @@ async function requestPermission(messaging){
 async function sendToken(messaging) {
   const currentToken = await messaging.getToken();
   console.log('currentToken : ' + currentToken);
-  fetch('https://medieval-warfare.herokuapp.com/api/register', { method: 'post', body: currentToken });
-  showData();
-  
+  subscribeToNotification(currentToken);
+}
+
+async function onTokenRefresh(messaging) {
   messaging.onTokenRefresh(async () => {
     console.log('token refreshed');
     const newToken = await messaging.getToken();
-    fetch('https://medieval-warfare.herokuapp.com/api/register', { method: 'post', body: currentToken });
+    subscribeToNotification(currentToken);
   });
+}
+
+function subscribeToNotification(currentToken){
+
+  const request = {
+    method: 'POST',
+    headers: createRequestHeader(),
+    body: currentToken
+  }
+
+  const subscribeUri = 'https://medieval-warfare.herokuapp.com/notifications/register'; 
+
+
+  fetch(subscribeUri, request);
+}
+
+function createRequestHeader() {
+  var myHeaders = new Headers();
+  const JWT = getJWT();
+  myHeaders.append("Authorization", 'Bearer ' + getJWT());
+  return myHeaders;
+
+}
+
+function getJWT(){
+  const JWT = localStorage.getItem('jwt');
+  return JWT;
 }
