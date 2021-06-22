@@ -22,6 +22,9 @@ main {
     [Inject]
     public IUserService UserService { get; set; }
 
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     public UserConnectionModel User = null;
 
     /// <summary>
@@ -37,6 +40,10 @@ main {
 
         User = await UserService.GetCurrentUser();
         ((UserService)UserService).UserChanged += UserChangedHandler;
+
+        if(User == null){
+            NavigationManager.NavigateTo("/");
+        }
     }
 
     private async void UserChangedHandler()

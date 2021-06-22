@@ -3,14 +3,12 @@
 @using frontend.Model.User
 @using frontend.Service.Declaration
 
-
-
 <section  class="login">
     <h1>Connexion</h1>
     <EditForm EditContext="@editContext" OnSubmit="@HandleSubmit">
         <DataAnnotationsValidator/>
         <ValidationSummary/>
-        <CustomInput label="Email" @bind-inputValue="UserConnectionModel.Email"/>
+        <CustomInput label="Pseudo" @bind-inputValue="UserConnectionModel.UserName"/>
         <CustomInput type="password" label="Mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
     </EditForm>
     <div class="bottomInfo">
