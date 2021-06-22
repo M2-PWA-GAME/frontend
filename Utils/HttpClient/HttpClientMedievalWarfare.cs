@@ -50,7 +50,7 @@ namespace frontend.Utils.HttpClient
 
                 return JsonSerializer.Deserialize<T>(entityJson);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }
@@ -73,7 +73,7 @@ namespace frontend.Utils.HttpClient
 
                 return JsonSerializer.Deserialize<TResponse>(entityJson);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }

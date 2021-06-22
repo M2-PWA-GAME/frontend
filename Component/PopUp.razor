@@ -5,7 +5,7 @@
         @Content
     </div>
     <div class="popUp__action">
-        <button @onclick="@ClosePopUp"> Fermer </button>
+        <CustomButton title="Fermer" full="false" OnClickCallback="@ClosePopUp"/>
         @Action
     </div>
 </div>
@@ -30,7 +30,7 @@
 .popUp.active{
     display: block;
     position: absolute;
-    top: 50%; 
+    top: 40%; 
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000000;
@@ -65,8 +65,7 @@
     bottom: 0;
     left: 0;
     padding: 20px;
-    width: -webkit-fill-available;
-    width: 100%;
+    width: calc(100% - 40px);
     background-color: teal;
     justify-content: space-around;
     align-items: center;
@@ -77,19 +76,19 @@
     private Boolean _displayPopUp;
 
     [Parameter]
-    public Boolean DisplayPopUp
+    public Boolean displayPopUp
     {
         get => _displayPopUp;
         set
         {
             if (_displayPopUp == value ) return;
             _displayPopUp = value;
-            DisplayPopUpChanged.InvokeAsync(value);
+            displayPopUpChanged.InvokeAsync(value);
         }
     }
 
     [Parameter]
-    public EventCallback<Boolean> DisplayPopUpChanged { get; set; }
+    public EventCallback<Boolean> displayPopUpChanged { get; set; }
     
     [Parameter]
     public RenderFragment Content { get; set; }
@@ -99,7 +98,7 @@
 
     private String GetPopClassActiv()
     {
-        if(DisplayPopUp){
+        if(displayPopUp){
             return "active";
         }else{
             return null;
@@ -107,6 +106,6 @@
     }
 
     private void ClosePopUp() {
-        DisplayPopUp = false;
+        displayPopUp = false;
     }
 }

@@ -8,8 +8,8 @@
     <EditForm EditContext="@editContext" OnSubmit="@HandleSubmit">
         <DataAnnotationsValidator/>
         <ValidationSummary/>
-        <CustomInput label="Pseudo" @bind-inputValue="UserConnectionModel.UserName"/>
-        <CustomInput type="password" label="Mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
+        <CustomInput isInForm="true" label="Pseudo" @bind-inputValue="UserConnectionModel.UserName"/>
+        <CustomInput isInForm="true" type="password" label="Mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
     </EditForm>
     <div class="bottomInfo">
         <CustomButton title="Connexion" full="true" OnClickCallback="@HandleSubmit"/>

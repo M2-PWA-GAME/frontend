@@ -2,7 +2,14 @@
   
     
 <div class="inputGroup">
-    <InputText type="@type" @bind-Value="inputValue"/>      
+    @if (isInForm == true)
+    {
+        <InputText type="type" @bind-value="inputValue"/>   
+    }
+    @if (isInForm == false)
+    {
+        <input type="type" @bind-value="inputValue"/>   
+    }     
     <span class="bar"/>
     <label>@label</label>
 </div>
@@ -25,6 +32,9 @@
 
     [Parameter]
     public EventCallback<String> InputValueChanged { get; set; }
+
+    [Parameter]
+    public Boolean isInForm {get; set;} = false;
 
     [Parameter]
     public String label { get; set; }

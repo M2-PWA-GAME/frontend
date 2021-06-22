@@ -22,18 +22,11 @@ else
 <p>Pas de partie en cours</p>
 }
 
-<PopUp @bind-DisplayPopUp="@CreateGamePopUp">
-    <Content>
-        <GameCreatorForm XMax="25" YMax="25"/>
-    </Content>
-    <Action>
-        <button>Test</button>
-    </Action>
-</PopUp>
+<GameJoinPopUpForm @bind-DisplayPopUp="@JoinGamePopUp"/>
 
 <div class="bottomActions">
     <CustomButton title="Cree partie" full="true" OnClickCallback="@CreateGame"/>
-    <CustomButton title="Rejoindre partie" full="false" OnClickCallback="@CJoinGame"/>   
+    <CustomButton title="Rejoindre partie" full="false" OnClickCallback="@openJoinGamePopUp"/>   
 </div>
 <p>
     @message
@@ -70,14 +63,14 @@ else
 
     public String message;
 
-    public Boolean CreateGamePopUp = false;
+    public Boolean JoinGamePopUp = false;
 
     
     private void CreateGame(){
-        @* CreateGamePopUp = true; *@
         NavigationManager.NavigateTo("/games");
     }
-    private void CJoinGame(){
+    private void openJoinGamePopUp(){
+        JoinGamePopUp = true;
     }
 
     /// <summary>
