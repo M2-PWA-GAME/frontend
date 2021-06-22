@@ -1,4 +1,4 @@
-<NavLink class="gameCard" href="@gameLink" Match="NavLinkMatch.All">
+<NavLink class="gameCard" href="@buildGameLink()" Match="NavLinkMatch.All">
     <img src="https://images.unsplash.com/photo-1585504198199-20277593b94f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1477&q=80"/> 
     <div class="gameInfo">
         <p>@gameName</p>
@@ -68,5 +68,10 @@
     public String gameName { get; set; }
 
     [Parameter]
-    public String gameLink { get; set; }
+    public String gameId { get; set; }
+
+    private String buildGameLink (){
+        var composeGameLink = "/games/" + gameId;
+        return composeGameLink;
+    }
 }
