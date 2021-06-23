@@ -26,12 +26,13 @@ function displayNotification(notification, data){
 })();
   
 async function initNotification() {
+  const registration = await navigator.serviceWorker.register('service-worker.js')
   await navigator.serviceWorker.ready;  
-  initialiseFirebaseApp();
-  const messaging = await setUpFirebaseMessagingService();
+  await initialiseFirebaseApp();
+  const messaging = await setUpFirebaseMessagingService(registration);
   await requestPermission(messaging);
   await sendToken(messaging);
-  onTokenRefresh(messaging);
+  await onTokenRefresh(messaging);
 }
 
 function initialiseFirebaseApp() {
@@ -43,22 +44,10 @@ function initialiseFirebaseApp() {
   });
 }
 
-async function setUpFirebaseMessagingService() {
-    navigator.serviceWorker.register('service-worker.js')
-        .then(function (registration) {
-            // Enregistrement du service
-            console.log('Registration succeeded');
-            // mise a jour du service
-            registration.update();
-
-            const messaging = firebase.messaging();
-            messaging.usePublicVapidKey('BJlaPdeE3mUReTWUgbr6iLkaKfcQ4UsyXup0xVXKm9n1xBCEHb5G5rSyufNCmtaZiyiZq-26ZKWeQ92vD2rTzec');
-            messaging.useServiceWorker(registration);
-        })
-        .catch(function (error) {
-            // registration failed
-            console.log('Registration failed : ', error);
-        });;
+async function setUpFirebaseMessagingService(registration) {
+  const messaging = firebase.messaging();
+  messaging.usePublicVapidKey('BJlaPdeE3mUReTWUgbr6iLkaKfcQ4UsyXup0xVXKm9n1xBCEHb5G5rSyufNCmtaZiyiZq-26ZKWeQ92vD2rTzec');
+  messaging.useServiceWorker(registration);
   return messaging;
 }
 
@@ -73,7 +62,7 @@ async function requestPermission(messaging){
 
 async function sendToken(messaging) {
   const currentToken = await messaging.getToken();
-  console.log('currentToken : ' + currentToken);
+  console.log('Current notification token : ' + currentToken);
   subscribeToNotification(currentToken);
 }
 
@@ -93,10 +82,9 @@ function subscribeToNotification(currentToken){
     body: currentToken
   }
 
-  const subscribeUri = 'https://medieval-warfare.herokuapp.com/notifications/register'; 
-
-
-  fetch(subscribeUri, request);
+  const subscribeUri = 'https://medieval-warfare.herokuapp.com/notifications/register';
+  console.log('send request to associate notification and user')
+  fetch(subscribeUri, request).then(Response => console.log(Response));
 }
 
 function createRequestHeader() {
