@@ -38,6 +38,8 @@ namespace frontend.Service.Implementation
 
         private PlayerStateModel _userLastPlayerState;
 
+        private WhosTurnModel _whosTurn;
+
         public List<PlayerStateModel> LastPlayerStates { get; set; }
 
         public bool IsInActions { get; set; } = false;
@@ -49,19 +51,42 @@ namespace frontend.Service.Implementation
             LastSelectedPlayer = playerStateModel;
         }
 
+        public bool IsUserTurn => _whosTurn.WhoseTurn == _userId;
+
         public GameController(GameModel game, string userId, IJSRuntime jsRuntime, IGameService gameService)
         {
             _game = game;
             _userId = userId;
             _jsRuntime = jsRuntime;
             _gameService = gameService;
-            InitGame();
         }
 
         public async Task EndTurn()
         {
             await LocalStorageInterop.SetItem(_jsRuntime, "game_" + _game.Id, JsonSerializer.Serialize(new GameSaveModel { RoundIndex = GetLastRound().Index, TurnIndex = GetLastRound().Turns.IndexOf(GetLastTurn()) }));
             IsPlayerTurn = false;
+
+            if (!HasAttacked || !HasMoved)
+            {
+                ActionModel actionModel = new ActionModel
+                                              {
+                                                  ActionType = ActionTypes.PASS,
+                                                  From = new Vector2Model
+                                                             {
+                                                                 X = _userLastPlayerState.Position.X,
+                                                                 Y = _userLastPlayerState.Position.Y
+                                                             },
+                                                  To = new Vector2Model
+                                                           {
+                                                               X = _userLastPlayerState.Position.X,
+                                                               Y = _userLastPlayerState.Position.Y
+                                                  }
+                                              };
+
+                await _gameService.SendAction(_game.Id, actionModel);
+            }
+
+            _whosTurn = await _gameService.WhosTurn(_game.Id);
         }
 
         private PlayerStateModel GetLastPlayerStateForUser(string userId)
@@ -97,7 +122,7 @@ namespace frontend.Service.Implementation
         {
             foreach (var tileModel in tiles)
             {
-                if (Distance(tileModel.Position, positionToCompare) <= tilesFrom && !tileModel.Position.Equals(positionToCompare))
+                if (tileModel.IsNavigable && Distance(tileModel.Position, positionToCompare) <= tilesFrom && !tileModel.Position.Equals(positionToCompare))
                 {
                     tileModel.HoverColor = hexColor;
                 }
@@ -132,7 +157,7 @@ namespace frontend.Service.Implementation
         public async Task TileClick(TileModel tile)
         {
             int playerDistance = Distance(tile.Position, _userLastPlayerState.Position);
-            if (_isMoving && playerDistance <= _userLastPlayerState.MouvementPointLeft)
+            if (_isMoving && playerDistance <= _userLastPlayerState.MouvementPointLeft && tile.IsNavigable)
             {
                 _userLastPlayerState.MouvementPointLeft = _userLastPlayerState.MouvementPointLeft - playerDistance;
                 ActionModel actionModel = new ActionModel
@@ -192,6 +217,53 @@ namespace frontend.Service.Implementation
             }
 
             CancelActions();
+
+            if (HasAttacked && HasMoved)
+            {
+                await EndTurn();
+            }
+        }
+
+        public async Task OnPlayerClick(PlayerStateModel playerStateModel)
+        {
+            int playerDistance = Distance(playerStateModel.Position, _userLastPlayerState.Position);
+            if (_isAttacking && playerDistance <= _userLastPlayerState.Weapon.Range)
+            {
+                _userLastPlayerState.ObjectImage = "/img/Characters/Sword_16_LEFT.png";
+                Timer timer = new Timer(500);
+                timer.Elapsed += (sender, args) =>
+                    {
+                        _userLastPlayerState.ObjectImage = string.Empty;
+                        RefreshRequested?.Invoke();
+                    };
+                timer.AutoReset = true;
+                timer.Enabled = true;
+                ActionModel actionModel = new ActionModel
+                                              {
+                                                  ActionType = ActionTypes.HIT,
+                                                  From = new Vector2Model
+                                                             {
+                                                                 X = _userLastPlayerState.Position.X,
+                                                                 Y = _userLastPlayerState.Position.Y
+                                                             },
+                                                  To = new Vector2Model
+                                                           {
+
+                                                               X = playerStateModel.Position.X,
+                                                               Y = playerStateModel.Position.Y
+                                                           }
+                                              };
+
+                await _gameService.SendAction(_game.Id, actionModel);
+                HasAttacked = true;
+            }
+
+            CancelActions();
+
+            if (HasAttacked && HasMoved)
+            {
+                await EndTurn();
+            }
         }
 
         public void ToogleAttackingActions()
@@ -225,8 +297,7 @@ namespace frontend.Service.Implementation
             }
         }
 
-        private void InitGame()
-        {
+        public async Task InitGameAsync() {
             InitGame(_game);
 
             _userLastPlayerState = GetLastPlayerStateForUser(_userId);
@@ -248,6 +319,8 @@ namespace frontend.Service.Implementation
                     playerStateModel.MouvementPointLeft = GameInfos.PLAYER_MOUVEMENT;
                 }
             }
+
+            _whosTurn = await _gameService.WhosTurn(_game.Id);
         }
 
         public static void InitGame(GameModel game)
@@ -267,12 +340,14 @@ namespace frontend.Service.Implementation
                         {
                             tileModel.MapImage = "/img/grass_16.png";
                             tileModel.ObjectImage = "/img/wood_16.png";
+                            tileModel.IsNavigable = false;
                             break;
                         }
 
                     case "WATER":
                         {
                             tileModel.MapImage = "/img/water_16.png";
+                            tileModel.IsNavigable = false;
                             break;
                         }
                 }
