@@ -12,6 +12,7 @@
     @if (GameModel?.Map != null)
     {
         <div class="mapContainer">
+            <p class="mapContainer__seed">Seed : @GameModel.Map.Seed</p>
             <MapPreview MapModel="@GameModel.Map"></MapPreview>
         </div>
     }
@@ -25,47 +26,44 @@
     <h3>Parametre de la game :</h3>
     @if (GameModel != null)
     {
-        <div>
-            Name <input type="text" @bind-value="GameModel.Name" />
+        <div class="gameInput">
+            <p>Nom de la partie :</p>
+            <input type="text" @bind-value="GameModel.Name" />
         </div>
-        <div>
-            MaxPlayers <input type="text" @bind-value="GameModel.MaxPlayers" />
+        <div class="gameInput">
+            <p>Nombre de jouers :</p><input type="text" @bind-value="GameModel.MaxPlayers" />
         </div>
-        @if (GameModel.Map != null)
-        {
-            <div>
-                Seed <input type="text" @bind-value="GameModel.Map.Seed" />
-            </div>
-        }
     }
-        <div>
+    <div class="mapInputGroup">
+        <p>Taille de la map :</p> 
+        <div class="mapInputGroup__mapInput">
             <input type="text" @bind-value="NewXMax" />
-        </div>
-        <div>
+            <span>x</span>
             <input type="text" @bind-value="NewYMax" />
         </div>
+    </div>
 <div class="bottomActions">
     <CustomButton title="Changement de terrain" full="false" OnClickCallback="@OnReloadClick"/>
     <CustomButton title="Wazaaaa !" full="true" OnClickCallback="@OnCreateClick"/>   
 </div>
 
 <style>
-    .bottomActions{
-        position: fixed;
-        max-height: 100px;
-        background-color: #F5F5F5;
-        width: 100%;
-        left: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: row;
-        align-content: center;
-        justify-content: center;
-    }
+.bottomActions{
+    position: fixed;
+    max-height: 100px;
+    background-color: #F5F5F5;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+}
 
-    .bottomActions .customButton{
-        width: 150px;
-    }
+.bottomActions .customButton{
+    width: 150px;
+}
 .mapContainer{
     width: 100%;
     height: 45vh;
@@ -73,6 +71,47 @@
     display: flex; 
     align-items: center; 
     justify-content: center;
+    position: relative;
+}
+.mapContainer__seed{
+    position: absolute;
+    top: 5px;
+    z-index: 100;
+    left: 5px;
+    color: red;
+}
+
+.gameInput{
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+    margin: 10px 0;
+}
+.gameInput p,.gameInput input {
+    width: 50%;
+}
+.mapInputGroup{
+    width: 100%;
+    display: flex;
+}
+.mapInputGroup p{
+    width: 49%;
+}
+.mapInputGroup__mapInput{
+    display: flex;
+    flex-wrap: nowrap;
+    width: 50%;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+.mapInputGroup__mapInput input{
+    width: 45%;
+}
+.mapInputGroup__mapInput span{
+    width: 8%;
+    margin-left: 2%;
 }
 </style>
 
