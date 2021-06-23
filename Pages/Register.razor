@@ -12,7 +12,7 @@
         <CustomInput type="password" label="Confirmation mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
     </EditForm>
     <div class="bottomInfo">
-        <CustomButton title="Inscription" full="true"/>
+        <CustomButton title="Inscription" full="true" OnClickCallback="@HandleSubmit"/>
         <p>Vous avez deja un compte ?</p>
         <NavLink href="/login" Match="NavLinkMatch.All">
             <i>Se connecter</i>
