@@ -320,7 +320,10 @@ namespace frontend.Service.Implementation
                 }
             }
 
-            _whosTurn = await _gameService.WhosTurn(_game.Id);
+            if (_game.Status == GameStatus.PLAYING)
+            {
+                _whosTurn = await _gameService.WhosTurn(_game.Id);
+            }
         }
 
         public static void InitGame(GameModel game)
