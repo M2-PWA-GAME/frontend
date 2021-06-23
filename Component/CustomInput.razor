@@ -2,13 +2,14 @@
   
     
 <div class="inputGroup">
-    @if (isInForm == true)
+    @if (@isInForm == true)
     {
-        <InputText type="type" @bind-value="inputValue"/>   
+        <InputText type="@type" @bind-Value="inputValue"/>   
     }
-    @if (isInForm == false)
+
+    @if (@isInForm == false)
     {
-        <input type="type" @bind-value="inputValue"/>   
+        <input type="@type" @bind-value="inputValue"/>   
     }     
     <span class="bar"/>
     <label>@label</label>
