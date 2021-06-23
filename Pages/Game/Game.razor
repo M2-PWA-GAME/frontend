@@ -93,6 +93,14 @@
             </div>
         </div>
     }
+    @if (GameModel.Status == GameStatus.WAITING)
+    {
+        <div class="row">
+            <div class="col-6">
+                Share this link : <input value="@JoinUrl"/> <button @onclick="() => { OnCopy(); }">Copy</button>
+            </div>
+        </div>
+    }
 }
 
 <h3> Users : </h3>
@@ -106,6 +114,7 @@
     public string Code { get; set; }
 
     public GameModel GameModel { get; set; } = null;
+    public string JoinUrl => $"{NavManager?.BaseUri}games/join/{GameModel?.Id}";
 
     [Inject]
     public IGameService GameService { get; set; }
@@ -144,7 +153,10 @@
         }
     }
 
-
+    private void OnCopy()
+    {
+        JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", JoinUrl);
+    }
 
     private void Game_OnRefreshRequested()
     {

@@ -4,6 +4,7 @@ using frontend.Model.User;
 using frontend.Service.Declaration;
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace frontend.Utils.Component
 {
@@ -22,6 +23,9 @@ namespace frontend.Utils.Component
 
         [Inject]
         public NavigationManager NavManager { get; set; }
+
+        [Inject]
+        public IJSRuntime JsRuntime { get; set; }
 
         /// <summary>
         /// Method invoked when the component is ready to start, having received its

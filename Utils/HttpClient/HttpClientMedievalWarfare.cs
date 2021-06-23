@@ -62,6 +62,31 @@ namespace frontend.Utils.HttpClient
             }
         }
 
+        public async Task GetJsonAsync(string url)
+        {
+            try
+            {
+                string token = await GetToken();
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return;
+                }
+
+                DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await GetAsync(url);
+                string entityJson = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("not connected");
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<TResponse> PostJsonAsync<TBody, TResponse>(string url, TBody body)
         {
             try

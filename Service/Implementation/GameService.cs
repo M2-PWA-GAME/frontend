@@ -55,7 +55,7 @@ namespace frontend.Service.Implementation
 
         public async Task JoinGame(string code)
         {
-            await _httpClientMedievalWarfare.GetJsonAsync<object>($"/games/join/{code}");
+            await _httpClientMedievalWarfare.GetJsonAsync($"/games/join/{code}");
         }
 
         public async Task<GameModel> SendAction(string code, ActionModel action)
