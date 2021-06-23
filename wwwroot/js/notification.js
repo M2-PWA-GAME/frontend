@@ -26,13 +26,28 @@ function displayNotification(notification, data){
 })();
   
 async function initNotification() {
-  const registration = await navigator.serviceWorker.register('service-worker.js')
+  const registration = await registerServiceWorker();
   await navigator.serviceWorker.ready;  
-  await initialiseFirebaseApp();
+  initialiseFirebaseApp();
   const messaging = await setUpFirebaseMessagingService(registration);
   await requestPermission(messaging);
   await sendToken(messaging);
   await onTokenRefresh(messaging);
+}
+
+async function registerServiceWorker() {
+  return await navigator.serviceWorker.register('service-worker.js')
+        .then(registration => {
+            // Enregistrement du service
+            console.log('SW Registration succeeded');
+            // mise a jour du service
+            registration.update();
+            return registration;
+        })
+        .catch(function (error) {
+            // registration failed
+            console.log('Registration failed : ', error);
+        });;
 }
 
 function initialiseFirebaseApp() {
