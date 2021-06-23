@@ -79,6 +79,9 @@
                         </div>
                         <div class="col-6">
                             <div>
+                                @(Users?.FirstOrDefault(u => u.Id == GameController.LastSelectedPlayer.Id)?.UserName ?? "")
+                            </div>
+                            <div>
                                 Health @GameController.LastSelectedPlayer.Health
                             </div>
                             <div>
