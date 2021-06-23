@@ -44,10 +44,21 @@ function initialiseFirebaseApp() {
 }
 
 async function setUpFirebaseMessagingService() {
-  const registration = await navigator.serviceWorker.register('/service-worker.js');
-  const messaging = firebase.messaging();
-  messaging.usePublicVapidKey('BJlaPdeE3mUReTWUgbr6iLkaKfcQ4UsyXup0xVXKm9n1xBCEHb5G5rSyufNCmtaZiyiZq-26ZKWeQ92vD2rTzec');
-  messaging.useServiceWorker(registration);
+    navigator.serviceWorker.register('service-worker.js')
+        .then(function (registration) {
+            // Enregistrement du service
+            console.log('Registration succeeded');
+            // mise a jour du service
+            registration.update();
+
+            const messaging = firebase.messaging();
+            messaging.usePublicVapidKey('BJlaPdeE3mUReTWUgbr6iLkaKfcQ4UsyXup0xVXKm9n1xBCEHb5G5rSyufNCmtaZiyiZq-26ZKWeQ92vD2rTzec');
+            messaging.useServiceWorker(registration);
+        })
+        .catch(function (error) {
+            // registration failed
+            console.log('Registration failed : ', error);
+        });;
   return messaging;
 }
 
