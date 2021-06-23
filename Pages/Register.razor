@@ -6,6 +6,7 @@
 <section  class="register">
     <h1>Inscription</h1>
     <EditForm EditContext="@editContext" OnSubmit="@HandleSubmit">
+        <CustomInput label="Username" @bind-inputValue="UserConnectionModel.UserName"/>
         <CustomInput label="Email" @bind-inputValue="UserConnectionModel.Email"/>
         <CustomInput type="password" label="Mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
         <CustomInput type="password" label="Confirmation mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
