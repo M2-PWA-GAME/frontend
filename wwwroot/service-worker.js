@@ -18,8 +18,10 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 messaging.usePublicVapidKey('BJlaPdeE3mUReTWUgbr6iLkaKfcQ4UsyXup0xVXKm9n1xBCEHb5G5rSyufNCmtaZiyiZq-26ZKWeQ92vD2rTzec');
 
+
+/*
 self.addEventListener('push', async event => {
-    const db = await getDb();
+    //const db = await getDb();
     const tx = this.db.transaction('notifications', 'readwrite');
     const store = tx.objectStore('notifications');
   
@@ -33,4 +35,4 @@ self.addEventListener('push', async event => {
         client.postMessage('newData');
       }
     };
-});
+});*/

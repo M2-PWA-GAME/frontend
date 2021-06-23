@@ -16,7 +16,7 @@ function displayNotification(notification, data){
   var myNotification = new Notification(notificationTitle, notificationOptions );
 
   myNotification.onclick = function(event) {
-    window.location.href = '/game/' + data.gameId;
+    window.location.href = '/games/' + data.gameId;
   }
 }
 
