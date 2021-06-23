@@ -39,7 +39,13 @@ namespace frontend.Utils.HttpClient
         {
             try
             {
-                DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetToken());
+                string token = await GetToken();
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return default(T);
+                }
+
+                DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var response = await GetAsync(url);
                 string entityJson = await response.Content.ReadAsStringAsync();
 

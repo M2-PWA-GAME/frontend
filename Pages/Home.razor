@@ -60,7 +60,7 @@ else
 
     public Boolean JoinGamePopUp = false;
 
-    
+
     private void CreateGame(){
         NavigationManager.NavigateTo("/games");
     }
@@ -77,8 +77,8 @@ else
     /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
     protected override async Task OnInitializedAsync()
     {
-        UserGames = await GameService.ListUserActiveGame();
-
         await base.OnInitializedAsync();
+
+        UserGames = await GameService.ListUserActiveGame();
     }
 }
