@@ -33,5 +33,7 @@ namespace frontend.Service.Declaration
         Task JoinGame(string code);
 
         Task<GameModel> SendAction(string code, ActionModel action);
+
+        Task<WhosTurnModel> WhosTurn(string code);
     }
 }

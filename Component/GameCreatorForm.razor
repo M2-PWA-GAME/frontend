@@ -5,6 +5,7 @@
 @using frontend.Service.Declaration
 @using frontend.Service.Implementation
 @using Microsoft.AspNetCore.Components.Web
+@inject NavigationManager NavigationManager
 
 
     <h3>Le champs de bataille :</h3>
@@ -171,6 +172,8 @@
             MaxPlayers = GameModel.MaxPlayers,
             Name = GameModel.Name
         });
+
+        NavigationManager.NavigateTo("/home");
     }
 
 
