@@ -1,0 +1,93 @@
+@page "/login"
+@layout NotConnectedLayout
+@using frontend.Model.User
+@using frontend.Service.Declaration
+
+<section  class="login">
+    <h1>Connexion</h1>
+    <EditForm EditContext="@editContext" OnSubmit="@HandleSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <CustomInput isInForm="true" label="Pseudo" @bind-inputValue="UserConnectionModel.UserName"/>
+        <CustomInput isInForm="true" type="password" label="Mot de passe" @bind-inputValue="UserConnectionModel.Password"/>
+    </EditForm>
+    <div class="bottomInfo">
+        <CustomButton title="Connexion" full="true" OnClickCallback="@HandleSubmit"/>
+        <p>Pas encore de compte ?</p>
+        <NavLink href="/register" Match="NavLinkMatch.All">
+            <i>Se cree un compte</i>
+        </NavLink>
+    </div>
+</section>
+
+<style>
+.login {
+    text-align: center;
+}   
+.login h1 {
+    display: inline-block;
+    width: calc(100% - 60px);
+    text-align: center;
+    font-size: 1.8em;
+    padding: 20px 30px;
+    margin: clamp(100px, 12vh, 12vh) 0;
+}
+.login .bottomInfo {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    margin: clamp(20px, 5vh, 200px) 0;
+    text-align: center;
+}
+
+.login .bottomInfo i{
+    display: inline-block;
+    color: black;
+    text-decoration: underline;
+}
+
+.login form{
+    display: inline-block;
+    text-align: center;
+    width: calc(100% - 80px);
+    margin: 0px 40px;
+}
+
+</style>
+
+@code{
+    [Inject]
+    public IUserService UserService { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    public UserConnectionModel UserConnectionModel = new UserConnectionModel();
+
+    private EditContext editContext;
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        editContext = new EditContext(UserConnectionModel);
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (editContext.Validate())
+        {
+            await UserService.SignIn(UserConnectionModel);
+            NavigationManager.NavigateTo("/home");
+        }
+    }
+
+}

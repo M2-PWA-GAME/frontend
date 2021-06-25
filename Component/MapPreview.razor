@@ -1,0 +1,45 @@
+﻿@using frontend.Model
+@using frontend.Model.Game
+@using frontend.Service.Declaration
+@using frontend.Service.Implementation
+@using frontend.Common
+
+@if (MapModel != null)
+{
+    <div class="map-16">
+        <div class="map">
+            <div style="display: grid; grid-template-columns: repeat(@MapModel.XMax, 1fr); width: @(16 * MapModel.XMax)px">
+
+                @for (int x = 0; x < MapModel.XMax; x++)
+                {
+                    @for (int y = 0; y < MapModel.YMax; y++)
+                    {
+                        <div style="grid-row: @(y + 1);">
+                            <Tile X="x" Y="y" ActualTile="GetTileAt(x, y)" GameController="@GameController" />
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+}
+<style>
+    .map16{
+        width: inherit;
+        height: inherit;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public MapModel MapModel {get; set; }
+
+    [Parameter]
+    public GameController GameController { get; set; }
+
+    public TileModel GetTileAt(int x, int y)
+    {
+        return MapModel.Tiles.FirstOrDefault(t => t.Position.X == x && t.Position.Y == y);
+    }
+}

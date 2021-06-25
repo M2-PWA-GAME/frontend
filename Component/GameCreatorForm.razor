@@ -1,0 +1,219 @@
+﻿@inherits frontend.Utils.Component.AuthenticatedComponent
+
+@using frontend.Model
+@using frontend.Model.Game
+@using frontend.Service.Declaration
+@using frontend.Service.Implementation
+@using Microsoft.AspNetCore.Components.Web
+@inject NavigationManager NavigationManager
+
+
+    <h3>Le champs de bataille :</h3>
+    @if (GameModel?.Map != null)
+    {
+        <div class="mapContainer">
+            <p class="mapContainer__seed">Seed : @GameModel.Map.Seed</p>
+            <MapPreview MapModel="@GameModel.Map"></MapPreview>
+        </div>
+    }
+    @if (IsLoading)
+    {
+        <div style="display: flex; justify-content: center; align-items: center">
+            <img src="loader.svg" alt="loader" />
+        </div>
+    }
+
+    <h3>Parametre de la game :</h3>
+    @if (GameModel != null)
+    {
+        <div class="gameInput">
+            <p>Nom de la partie :</p>
+            <input type="text" @bind-value="GameModel.Name" />
+        </div>
+        <div class="gameInput">
+            <p>Nombre de jouers :</p><input type="text" @bind-value="GameModel.MaxPlayers" />
+        </div>
+    }
+    <div class="mapInputGroup">
+        <p>Taille de la map :</p> 
+        <div class="mapInputGroup__mapInput">
+            <input type="text" @bind-value="NewXMax" />
+            <span>x</span>
+            <input type="text" @bind-value="NewYMax" />
+        </div>
+    </div>
+<div class="bottomActions">
+    <CustomButton title="Changement de terrain" full="false" OnClickCallback="@OnReloadClick"/>
+    <CustomButton title="Wazaaaa !" full="true" OnClickCallback="@OnCreateClick"/>   
+</div>
+
+<style>
+.bottomActions{
+    position: fixed;
+    max-height: 100px;
+    background-color: #F5F5F5;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+}
+
+.bottomActions .customButton{
+    width: 150px;
+}
+.mapContainer{
+    width: 100%;
+    height: 45vh;
+    overflow: scroll;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    position: relative;
+}
+.mapContainer__seed{
+    position: absolute;
+    top: 5px;
+    z-index: 100;
+    left: 5px;
+    color: red;
+}
+
+.gameInput{
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+    margin: 10px 0;
+}
+.gameInput p,.gameInput input {
+    width: 50%;
+}
+.mapInputGroup{
+    width: 100%;
+    display: flex;
+}
+.mapInputGroup p{
+    width: 49%;
+}
+.mapInputGroup__mapInput{
+    display: flex;
+    flex-wrap: nowrap;
+    width: 50%;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+.mapInputGroup__mapInput input{
+    width: 45%;
+}
+.mapInputGroup__mapInput span{
+    width: 8%;
+    margin-left: 2%;
+}
+</style>
+
+
+
+@code {
+    public GameModel GameModel { get; set; }
+    public GameController GameController { get; set; }
+
+    [Parameter]
+    public int YMax { get; set; }
+
+    public int NewYMax { get; set; }
+
+    [Parameter]
+    public int XMax { get; set; }
+
+    public int NewXMax { get; set; }
+
+    [Inject]
+    public IGameService GameService { get; set; }
+
+    public bool ReloadComponent { get; set; } = true;
+
+    public bool IsLoading { get; set; } = false;
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        GameModel = new GameModel
+        {
+            MaxPlayers = 2,
+            Name = "Partie "
+        };
+        NewXMax = XMax;
+        NewYMax = YMax;
+        await ReloadMapAsync();
+    }
+
+    private async Task ReloadMapAsync()
+    {
+        XMax = NewXMax;
+        YMax = NewYMax;
+
+        GameModel.Map = null;
+        IsLoading = true;
+        StateHasChanged();
+
+        ReloadComponent = false;
+
+        var gameMap = await GameService.GenerateRandomMap(new GameGeneratorModel { XMax = XMax, YMax = YMax });
+
+        GameModel.Map = gameMap;
+
+        GameController.InitGame(GameModel);
+
+        ReloadComponent = true;
+        IsLoading = false;
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Returns a flag to indicate whether the component should render.
+    /// </summary>
+    /// <returns></returns>
+    protected override bool ShouldRender()
+    {
+        return ReloadComponent;
+    }
+
+    public TileModel GetTileAt(int x, int y)
+    {
+        return GameModel.Map.Tiles.FirstOrDefault(t => t.Position.X == x && t.Position.Y == y);
+    }
+
+    private async void OnReloadClick()
+    {
+        await ReloadMapAsync();
+    }
+
+    private async void OnCreateClick()
+    {
+        await GameService.CreateGame(new GameCreateModel
+        {
+            Seed = GameModel.Map.Seed,
+            YMax = GameModel.Map.YMax,
+            XMax = GameModel.Map.XMax,
+            MaxPlayers = GameModel.MaxPlayers,
+            Name = GameModel.Name
+        });
+
+        NavigationManager.NavigateTo("/home");
+    }
+
+
+}

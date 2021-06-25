@@ -32,11 +32,11 @@ namespace frontend.Model
         public void MoveTo(TileModel tile)
         {
 
-            int tileDistance = Math.Abs(X - tile.X) + Math.Abs(Y - tile.Y);
+            int tileDistance = Math.Abs(X - tile.Position.X) + Math.Abs(Y - tile.Position.Y);
             if (tileDistance <= MouvementPoint && tile.IsNavigable)
             {
-                X = tile.X;
-                Y = tile.Y;
+                X = tile.Position.X;
+                Y = tile.Position.Y;
                 MouvementPoint = MouvementPoint - tileDistance;
             }
         }

@@ -1,0 +1,53 @@
+﻿@inherits frontend.Utils.Component.AuthenticatedComponent
+
+@using frontend.Model
+@using frontend.Model.Game
+@using frontend.Service.Declaration
+
+
+<PopUp @bind-displayPopUp="@displayPopUp">
+    <Content>
+        <h3>Rejoindre le combat :</h3>
+        <CustomInput isInForm="false" type="text" label="Code de game" @bind-inputValue="GameCode"/>
+    </Content>
+    <Action>
+        <CustomButton title="Rejoindre !" full="true" OnClickCallback="@submitJoin"/>
+    </Action>
+</PopUp>
+
+
+
+@code {
+    private Boolean _displayPopUp;
+
+    [Parameter]
+    public Boolean displayPopUp
+    {
+        get => _displayPopUp;
+        set
+        {
+            if (_displayPopUp == value ) return;
+            _displayPopUp = value;
+            displayPopUpChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<Boolean> displayPopUpChanged { get; set; }
+
+    public string GameCode { get; set; }
+
+
+    [Inject]
+    public IGameService GameService { get; set; }
+
+
+    private async void submitJoin()
+    {
+        @if (!string.IsNullOrWhiteSpace(GameCode))
+        {
+            await GameService.JoinGame(GameCode);
+        }
+    }
+
+}

@@ -7,10 +7,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-using Blazored.LocalStorage;
-
 using frontend.Model.User;
 using frontend.Service.Declaration;
+using frontend.Utils.Helper;
 using frontend.Utils.Interop;
 
 using Microsoft.AspNetCore.Components;
@@ -37,15 +36,32 @@ namespace frontend.Service.Implementation
         public string CurrentToken { get; set; }
 
         /// <summary>
+        /// Obtient ou définit le token actuel.
+        /// </summary>
+        public DateTime? TokenEndDate { get; set; }
+
+        /// <summary>
         /// Obtient ou définit l'identifiant de l'utilisateur.
         /// </summary>
         public string CurrentUserId { get; set; }
 
         public event Action UserChanged;
 
+        private static UserService _instance = null;
+
+        public static UserService GetInstance()
+        {
+            return _instance;
+        }
+
         public UserService(IJSRuntime jsRuntime)
         {
+            if (_instance != null)
+            {
+                throw new Exception($"Une instance {nameof(UserService)} déjà existante");
+            }
             _jsRuntime = jsRuntime;
+            _instance = this;
         }
         
         /// <summary>
@@ -57,7 +73,7 @@ namespace frontend.Service.Implementation
         {
             try
             {
-                using (HttpClient http = new HttpClient ())
+                using (HttpClient http = new HttpClient())
                 {
                     string json = JsonSerializer.Serialize(userConnection);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -100,14 +116,80 @@ namespace frontend.Service.Implementation
         }
 
         /// <summary>
+        /// Rafraichit un token.
+        /// </summary>
+        /// <returns>Resultat de la <see cref="Task"/> asynchrone.</returns>
+        public async Task ResfreshToken()
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(CurrentToken))
+                {
+                    using (HttpClient http = new HttpClient())
+                    {
+                        http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CurrentToken);
+                        var response = await http.GetAsync("https://medieval-warfare.herokuapp.com/users/refresh");
+                        string token = await response.Content.ReadAsStringAsync();
+                        await HandleJwtTokenAsync(token);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Récupère l'utilisateur connecté.
+        /// </summary>
+        /// <returns>Utilisateur connecté.</returns>
+        public async Task<string> GetCurrentToken()
+        {
+            if (CurrentToken == null)
+            {
+                CurrentToken = await LocalStorageInterop.GetItem(_jsRuntime, "jwt");
+            }
+            if (TokenEndDate == null)
+            {
+                string dateJson = await LocalStorageInterop.GetItem(_jsRuntime, "jwtEndDate");
+                TokenEndDate = !string.IsNullOrWhiteSpace(dateJson) ? JsonSerializer.Deserialize<DateTime?>(dateJson) : null;
+            }
+
+            if (TokenEndDate < DateTime.Now || (TokenEndDate == null && CurrentToken != null))
+            {
+                await ResfreshToken();
+            }
+
+            if (CurrentToken == null)
+            {
+                await ResetJwtAsync();
+            }
+
+            return CurrentToken;
+        }
+
+        /// <summary>
         /// Récupère l'utilisateur connecté.
         /// </summary>
         /// <returns>Utilisateur connecté.</returns>
         public async Task<UserConnectionModel> GetCurrentUser()
         {
-            if (CurrentToken != null)
+            if (CurrentToken == null)
             {
                 CurrentToken = await LocalStorageInterop.GetItem(_jsRuntime, "jwt");
+            }
+
+            if (TokenEndDate == null)
+            {
+                string dateJson = await LocalStorageInterop.GetItem(_jsRuntime, "jwtEndDate");
+                TokenEndDate = !string.IsNullOrWhiteSpace(dateJson) ? JsonSerializer.Deserialize<DateTime?>(dateJson) : null;
+            }
+
+            if (TokenEndDate < DateTime.Now || (TokenEndDate == null && CurrentToken != null))
+            {
+                await ResfreshToken();
             }
 
             if (UserConnection == null)
@@ -120,7 +202,13 @@ namespace frontend.Service.Implementation
             {
                 await UpdateUser();
             }
-            return UserConnection;
+
+            if (CurrentToken == null)
+            {
+                await ResetJwtAsync();
+            }
+
+            return CurrentToken == null ? null : UserConnection;
         }
 
         /// <summary>
@@ -135,6 +223,24 @@ namespace frontend.Service.Implementation
                 {
                     http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CurrentToken);
                     var response = await http.GetAsync("https://medieval-warfare.herokuapp.com/users/me");
+                    string json = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<UserConnectionModel>(json);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+        public async Task<UserConnectionModel> GetUser(string id)
+        {
+            try
+            {
+                using (HttpClient http = new HttpClient())
+                {
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetCurrentToken());
+                    var response = await http.GetAsync($"https://medieval-warfare.herokuapp.com/users/{id}");
                     return JsonSerializer.Deserialize<UserConnectionModel>(await response.Content.ReadAsStringAsync());
                 }
             }
@@ -143,6 +249,11 @@ namespace frontend.Service.Implementation
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        public string GetCurrentUserId()
+        {
+            return CurrentUserId;
         }
 
         private async Task UpdateUser()
@@ -161,17 +272,42 @@ namespace frontend.Service.Implementation
             CurrentToken = token; 
             await LocalStorageInterop.SetItem(_jsRuntime, "jwt", CurrentToken);
 
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            SecurityToken jsonToken = handler.ReadToken(CurrentToken);
-            JwtSecurityToken tokenS = jsonToken as JwtSecurityToken;
-
-            CurrentUserId = tokenS.Claims.FirstOrDefault(c => c.Type == "user_id").Value;
-
-            if (UserConnection == null)
+            if (!string.IsNullOrWhiteSpace(CurrentToken))
             {
-                await UpdateUser();
-                UserConnection.Password = null;
-                await LocalStorageInterop.SetItem(_jsRuntime, "user", JsonSerializer.Serialize(UserConnection));
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                SecurityToken jsonToken = handler.ReadToken(CurrentToken);
+                JwtSecurityToken tokenS = jsonToken as JwtSecurityToken;
+
+                CurrentUserId = tokenS.Claims.FirstOrDefault(c => c.Type == "user_id").Value;
+                TokenEndDate = DateTimeHelper.UnixTimeStampToDateTime(int.Parse(tokenS.Claims.FirstOrDefault(c => c.Type == "exp").Value));
+                await LocalStorageInterop.SetItem(_jsRuntime, "jwtEndDate", JsonSerializer.Serialize(TokenEndDate));
+
+                if (UserConnection == null)
+                {
+                    await UpdateUser();
+                    UserConnection.Password = null;
+                    await LocalStorageInterop.SetItem(_jsRuntime, "user", JsonSerializer.Serialize(UserConnection));
+                }
+            }
+            else
+            {
+                await ResetJwtAsync();
+            }
+        }
+
+        private async Task ResetJwtAsync()
+        {
+            var localStorageToken = await LocalStorageInterop.GetItem(_jsRuntime, "jwt");
+            Console.WriteLine($"ResetJwtAsync | CurrentToken: {CurrentToken}, LocalStorage: {localStorageToken}");
+            if (string.IsNullOrWhiteSpace(CurrentToken) && string.IsNullOrWhiteSpace(localStorageToken))
+            {
+                Console.WriteLine($"ResetJwtAsync | CLEANED");
+                CurrentToken = null;
+                CurrentUserId = null;
+                UserConnection = null;
+                await LocalStorageInterop.SetItem(_jsRuntime, "user", null);
+                await LocalStorageInterop.SetItem(_jsRuntime, "jwtEndDate", null);
+                await LocalStorageInterop.SetItem(_jsRuntime, "jwt", null);
             }
         }
     }

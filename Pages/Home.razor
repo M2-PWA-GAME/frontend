@@ -1,0 +1,84 @@
+﻿@page "/home"
+@using frontend.Model
+@using frontend.Service.Declaration
+@using frontend.Model.Game
+@using frontend.Model.User
+@inject NavigationManager NavigationManager
+
+
+<h1>Liste des parties</h1>
+
+@if (UserGames != null && UserGames.Games.Count > 0)
+{
+@foreach (var game in UserGames.Games)
+    {
+<div>
+    <GameCard gameId="@game.Id" gameName="@game.Name"/>
+</div>
+    }
+}
+else
+{
+<p>Pas de partie en cours</p>
+}
+
+<GameJoinPopUpForm @bind-DisplayPopUp="@JoinGamePopUp"/>
+
+<div class="bottomActions">
+    <CustomButton title="Cree partie" full="true" OnClickCallback="@CreateGame"/>
+    <CustomButton title="Rejoindre partie" full="false" OnClickCallback="@openJoinGamePopUp"/>   
+</div>
+
+<style>
+    .bottomActions{
+        position: fixed;
+        max-height: 100px;
+        background-color: #F5F5F5;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        justify-content: center;
+    }
+
+    .bottomActions .customButton{
+        width: 150px;
+    }
+</style>
+
+@code{
+
+    /// <summary>
+    /// Obtient ou définit
+    /// </summary>
+    [Inject]
+    public IGameService GameService { get; set; }
+
+    public UserGamesModel UserGames { get; set; } = null;
+
+    public Boolean JoinGamePopUp = false;
+
+
+    private void CreateGame(){
+        NavigationManager.NavigateTo("/games");
+    }
+    private void openJoinGamePopUp(){
+        JoinGamePopUp = true;
+    }
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// Override this method if you will perform an asynchronous operation and
+    /// want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        UserGames = await GameService.ListUserActiveGame();
+    }
+}

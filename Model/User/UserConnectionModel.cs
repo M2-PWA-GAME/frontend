@@ -27,5 +27,8 @@ namespace frontend.Model.User
         [JsonPropertyName("password")]
         [Required]
         public string Password { get; set; }
+
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
     }
 }

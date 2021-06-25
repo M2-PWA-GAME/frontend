@@ -3,6 +3,9 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Play', sans-serif;
+}
 
 a, .btn-link {
     color: #0366d6;
@@ -60,6 +63,11 @@ a, .btn-link {
     position: relative;
 }
 
+.map-16 .tile {
+    width: 16px !important;
+    height: 16px !important;
+}
+
 .tile > .object {
     position: absolute;
     top: 0;
@@ -111,3 +119,31 @@ a, .btn-link {
             max-width: 100%;
             max-height: 100%;
         }
+
+.one-click-button {
+    touch-action: manipulation
+}
+
+.attack-sword-left {
+    animation: attack-left 0.4s ease-in-out;
+    position: absolute;
+    top: 0px;
+    left: -12px;
+}
+
+
+@keyframes attack-left {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(-90deg);
+    }
+}
+
+
+.player > img {
+    max-width: 100%;
+    max-height: 100%;
+}
