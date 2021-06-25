@@ -4,7 +4,24 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 h1, h2, h3, h4, h5, h6 {
+    color: white;
     font-family: 'Play', sans-serif;
+}
+
+main, body{
+    background-color: #2A1228;
+}
+
+p, span, label, i, b {
+    color: white;
+}
+
+ul {
+    padding: unset;
+}
+
+li {
+    list-style: none;
 }
 
 a, .btn-link {
