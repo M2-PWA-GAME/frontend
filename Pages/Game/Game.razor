@@ -1,6 +1,7 @@
 ﻿@page "/games/{code}"
 
 @inherits frontend.Utils.Component.AuthenticatedComponent
+@implements IDisposable
 
 @using frontend.Common
 @using frontend.Model.Game
@@ -11,105 +12,105 @@
 <h3>Game @(GameModel?.Status == GameStatus.WAITING ? "Waiting" : "Playing") | @GameModel?.Status</h3>
 @if (GameModel?.Map != null)
 {
-    <div style="position: relative">
-        <MapPreview MapModel="@GameModel.Map" GameController="@GameController" ></MapPreview>
-    
-        @if (GameModel != null && GameModel.Status == GameStatus.PLAYING)
+<div style="position: relative">
+    <MapPreview MapModel="@GameModel.Map" GameController="@GameController"></MapPreview>
+
+    @if (GameModel != null && GameModel.Status == GameStatus.PLAYING)
         {
             foreach (var gameControllerLastPlayerState in GameController.LastPlayerStates)
             {
-                <div class="player" @onclick="() => GameController.OnPlayerClick(gameControllerLastPlayerState)" style="top: @(gameControllerLastPlayerState.Position.Y * 16)px; left: @(gameControllerLastPlayerState.Position.X * 16)px;" @onmouseover="() => {GameController.DisplayMouvementAndAttackForPlayerState(gameControllerLastPlayerState);GameController.SetSelectedPlayer(gameControllerLastPlayerState);}" @onmouseout="GameController.CleanDisplay">
-                    <!-- onmouseover="MouseOverPlayer"  onmouseout="MouseOutPlayer"-->
-                    <img alt="Player image" src="@gameControllerLastPlayerState.CharacterImage" style="margin-top: -8px" />
-                    @if (!string.IsNullOrWhiteSpace(@gameControllerLastPlayerState.ObjectImage))
+    <div class="player" @onclick="() => GameController.OnPlayerClick(gameControllerLastPlayerState)" style="top: @(gameControllerLastPlayerState.Position.Y * 16)px; left: @(gameControllerLastPlayerState.Position.X * 16)px;" @onmouseover="() => {GameController.DisplayMouvementAndAttackForPlayerState(gameControllerLastPlayerState);GameController.SetSelectedPlayer(gameControllerLastPlayerState);}" @onmouseout="GameController.CleanDisplay">
+        <!-- onmouseover="MouseOverPlayer"  onmouseout="MouseOutPlayer"-->
+        <img alt="Player image" src="@gameControllerLastPlayerState.CharacterImage" style="margin-top: -8px" />
+        @if (!string.IsNullOrWhiteSpace(@gameControllerLastPlayerState.ObjectImage))
                     {
-                        <img alt="object image" class="attack-sword-left" src="@gameControllerLastPlayerState.ObjectImage" />
+        <img alt="object image" width="16" height="16" class="attack-sword-left" src="@gameControllerLastPlayerState.ObjectImage" />
                     }
-                </div>
+    </div>
             }
         }
 
-    </div>
-    @if (GameModel.Status == GameStatus.PLAYING)
+</div>
+@if (GameModel.Status == GameStatus.PLAYING)
     {
-        <div class="row">
-            <div class="col-3">
-                @if (GameController.IsUserTurn)
+<div class="row">
+    <div class="col-3">
+        @if (GameController.IsUserTurn)
                 {
-                    @if (!GameController.IsInActions)
+        @if (!GameController.IsInActions)
                     {
-                        @if (!GameController.HasAttacked)
+        @if (!GameController.HasAttacked)
                         {
-                            <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
-                                <img width="16" height="16" src="/img/battle.svg" alt="attack"/>
-                            </button>
+        <button name="attack" class="btn one-click-button" @onclick="@GameController.ToogleAttackingActions">
+            <img width="16" height="16" src="/img/battle.svg" alt="attack" />
+        </button>
                         }
-                        @if (!GameController.HasMoved)
+        @if (!GameController.HasMoved)
                         {
-                            <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
-                                <img width="16" height="16" src="/img/boots.svg" alt="move"/>
-                            </button>
+        <button name="move" class="btn one-click-button" @onclick="@GameController.ToogleMoveActions">
+            <img width="16" height="16" src="/img/boots.svg" alt="move" />
+        </button>
                         }
-                        <button name="endTurn" class="btn one-click-button" @onclick="@GameController.EndTurn">
-                            <img width="16" height="16" src="/img/end-turn.svg" alt="End Turn"/>
-                        </button>
+        <button name="endTurn" class="btn one-click-button" @onclick="@GameController.EndTurn">
+            <img width="16" height="16" src="/img/end-turn.svg" alt="End Turn" />
+        </button>
                     }
 
-                    @if (GameController.IsInActions)
+        @if (GameController.IsInActions)
                     {
-                        <button name="cancel" class="btn one-click-button" @onclick="@GameController.CancelActions">
-                            <span class="oi oi-x" alt="cancel"></span>
-                        </button>
+        <button name="cancel" class="btn one-click-button" @onclick="@GameController.CancelActions">
+            <span class="oi oi-x" alt="cancel"></span>
+        </button>
                     }
                 }
-            </div>
-            <div class="col-6">
-                @if (GameController.LastSelectedPlayer != null)
+    </div>
+    <div class="col-6">
+        @if (GameController.LastSelectedPlayer != null)
                 {
-                    <div class="row">
-                        <div class="col-3">
-                            @if (GameController.LastSelectedPlayer.Id == CurrentUser.Id)
+        <div class="row">
+            <div class="col-3">
+                @if (GameController.LastSelectedPlayer.Id == CurrentUser.Id)
                             {
-                                <img alt="selected player" src="/img/Characters/Character_16_DOWN.png"/>
+                <img alt="selected player" width="16" height="16" src="/img/Characters/Character_16_DOWN.png" />
                             }
                             else
                             {
-                                <img alt="selected player" src="/img/Characters/CharacterEnemy_16_DOWN.png"/>
+                <img alt="selected player" width="16" height="16" src="/img/Characters/CharacterEnemy_16_DOWN.png" />
                             }
-                        </div>
-                        <div class="col-6">
-                            <div>
-                                @(Users?.FirstOrDefault(u => u.Id == GameController.LastSelectedPlayer.Id)?.UserName ?? "")
-                            </div>
-                            <div>
-                                Health @GameController.LastSelectedPlayer.Health
-                            </div>
-                            <div>
-                                Armor @GameController.LastSelectedPlayer.Armor
-                            </div>
-                            <div>
-                                MouvementPointLeft @GameController.LastSelectedPlayer.MouvementPointLeft
-                            </div>
-                        </div>
-                    </div>
-                }
             </div>
-        </div>
-    }
-    @if (GameModel.Status == GameStatus.WAITING)
-    {
-        <div class="row">
             <div class="col-6">
-                Share this link : <input value="@JoinUrl"/> <button @onclick="() => { OnCopy(); }">Copy</button>
+                <div>
+                    @(Users?.FirstOrDefault(u => u.Id == GameController.LastSelectedPlayer.Id)?.UserName ?? "")
+                </div>
+                <div>
+                    Health @GameController.LastSelectedPlayer.Health
+                </div>
+                <div>
+                    Armor @GameController.LastSelectedPlayer.Armor
+                </div>
+                <div>
+                    MouvementPointLeft @GameController.LastSelectedPlayer.MouvementPointLeft
+                </div>
             </div>
         </div>
+                }
+    </div>
+</div>
+    }
+@if (GameModel.Status == GameStatus.WAITING)
+    {
+<div class="row">
+    <div class="col-6">
+        Share this link : <input value="@JoinUrl" /> <button @onclick="() => { OnCopy(); }">Copy</button>
+    </div>
+</div>
     }
 }
 
 <h3> Users : </h3>
 @foreach (var user in Users)
 {
-    <div>@user.UserName</div>
+<div>@user.UserName</div>
 }
 
 @code {
@@ -129,6 +130,8 @@
 
     public List<UserConnectionModel> Users { get; set; } = new List<UserConnectionModel>();
 
+    private DotNetObjectReference<Game> objRef;
+
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
     /// initial parameters from its parent in the render tree.
@@ -139,6 +142,9 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+        objRef = DotNetObjectReference.Create(this);
+        await JsRuntime.InvokeAsync<string>("registerGameDotNetHelper", objRef);
 
         GameModel = await GameService.GetGame(Code);
 
@@ -156,6 +162,32 @@
         }
     }
 
+    [JSInvokable]
+    public async Task RefreshGame()
+    {
+        if (GameController != null)
+        {
+            GameController.RefreshRequested -= Game_OnRefreshRequested;
+        }
+
+        GameModel = await GameService.GetGame(Code);
+
+        GameController = new GameController(GameModel, CurrentUser.Id, JsRuntime, GameService);
+        await GameController.InitGameAsync();
+
+        Users = new List<UserConnectionModel>();
+        foreach (var userId in GameModel.Users)
+        {
+            Users.Add(await UserService.GetUser(userId));
+        }
+        StateHasChanged();
+
+        if (GameController != null)
+        {
+            GameController.RefreshRequested += Game_OnRefreshRequested;
+        }
+    }
+
     private void OnCopy()
     {
         JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", JoinUrl);
@@ -164,5 +196,11 @@
     private void Game_OnRefreshRequested()
     {
         StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        GameController.RefreshRequested -= Game_OnRefreshRequested;
+        objRef?.Dispose();
     }
 }

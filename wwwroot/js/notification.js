@@ -2,12 +2,16 @@ navigator.serviceWorker.addEventListener('message', event => {
     console.log(event);
     console.log(event.data);
     displayNotification(event.data.firebaseMessaging.payload.notification, event.data.firebaseMessaging.payload.data);
+});
 
-  });
 
-function displayNotification(notification, data){
+window.registerGameDotNetHelper = (dotNetHelper) => {
+    console.log("registerGameDotNetHelper");
+    window.GameDotNetHelper = dotNetHelper;
+};
 
-  const notificationTitle = notification.title
+function displayNotification(notification, data) {
+  const notificationTitle = notification.title;
   const notificationOptions = {
     icon: "/icon-512.png",
     body: notification.body
@@ -17,10 +21,12 @@ function displayNotification(notification, data){
 
   myNotification.onclick = function(event) {
     window.location.href = '/games/' + data.gameId;
-  }
+    }
+    if (window.GameDotNetHelper) {
+        window.GameDotNetHelper.invokeMethodAsync('RefreshGame');
+    }
 }
 
-  
 (async ()=>{ 
    await initNotification();
 })();
@@ -104,10 +110,8 @@ function subscribeToNotification(currentToken){
 
 function createRequestHeader() {
   var myHeaders = new Headers();
-  const JWT = getJWT();
   myHeaders.append("Authorization", 'Bearer ' + getJWT());
   return myHeaders;
-
 }
 
 function getJWT(){
