@@ -12,7 +12,7 @@ main, body{
     background-color: #2A1228;
 }
 
-p, span, label, i, b {
+p, span, label, i, b, li {
     color: white;
 }
 
