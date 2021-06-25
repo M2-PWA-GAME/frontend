@@ -9,10 +9,10 @@
 @using frontend.Service.Declaration
 @using frontend.Service.Implementation
 
-<h3>Game @(GameModel?.Status == GameStatus.WAITING ? "Waiting" : "Playing") | @GameModel?.Status</h3>
+<h3>Status de la partie : @(GameModel?.Status == GameStatus.WAITING ? "En attente" : "En jeu") </h3>
 @if (GameModel?.Map != null)
 {
-<div style="position: relative">
+<div class="mapContainer">
     <MapPreview MapModel="@GameModel.Map" GameController="@GameController"></MapPreview>
 
     @if (GameModel != null && GameModel.Status == GameStatus.PLAYING)
@@ -99,19 +99,28 @@
     }
 @if (GameModel.Status == GameStatus.WAITING)
     {
-<div class="row">
-    <div class="col-6">
-        Share this link : <input value="@JoinUrl" /> <button @onclick="() => { OnCopy(); }">Copy</button>
-    </div>
-</div>
+    <h2>Ton lien d'invitation</h2>
+    <input style="width:100%" value="@JoinUrl" /> 
+    <CustomButton title="Copier Le lien d'invitation!" full="true" OnClickCallback="@OnCopy"/>
     }
 }
 
-<h3> Users : </h3>
+<h2> Participants : </h2>
+<ul>
 @foreach (var user in Users)
 {
-<div>@user.UserName</div>
+<li>@user.UserName</li>
 }
+</ul>
+
+<style>
+.mapContainer{
+    position: relative;
+    display: block;
+    width: 100%;
+    overflow: scroll;
+}
+</style>
 
 @code {
     [Parameter]

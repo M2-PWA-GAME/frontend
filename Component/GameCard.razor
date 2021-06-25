@@ -1,5 +1,5 @@
-<NavLink class="gameCard" href="@buildGameLink()" alt="Icône de bataille" Match="NavLinkMatch.All">
-    <img src="/img/battle.png"/> 
+<NavLink class="gameCard" href="@buildGameLink()" Match="NavLinkMatch.All">
+    <img src="/img/battle.png" alt="Icône de bataille" /> 
     <div class="gameInfo">
         <p>@gameName</p>
         <ul>
@@ -17,13 +17,17 @@
         display: flex;
         height: 120px;
         margin: 20px 0;
-        border: 1px solid;
+        background-color: white;
         border-radius: 4px;
+    }
+
+    .gameCard p, .gameCard span{
         color: black;
     }
 
     .gameCard img{
-        width: clamp(100px, 35%, 400px);
+        width: clamp(80px, calc(35% - 20px), 380px);
+        padding: 10px;
         object-fit: contain;
     }
 
@@ -58,6 +62,7 @@
     }
     .gameCard .gameInfo ul li {
         padding: 0 5px;
+        color: #D0393A;
     }
 
 </style>
