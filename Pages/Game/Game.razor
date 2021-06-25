@@ -9,7 +9,7 @@
 @using frontend.Service.Declaration
 @using frontend.Service.Implementation
 
-<h3>Status de la partie : @(GameModel?.Status == GameStatus.WAITING ? "En attente" : "En jeu") </h3>
+<h3>Statut de la partie : @(GameModel?.Status == GameStatus.WAITING ? "En attente" : "En jeu") </h3>
 @if (GameModel?.Map != null)
 {
 <div class="mapContainer">
